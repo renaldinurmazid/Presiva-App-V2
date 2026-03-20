@@ -1,0 +1,58 @@
+{
+  "expo": {
+    "name": "Presiva",
+    "slug": "Presiva",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/logo-presiva.png",
+    "scheme": "presiva",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.renaldinurmazid.Presiva"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/images/logo-presiva.png",
+        "backgroundImage": "./assets/images/logo-presiva.png",
+        "monochromeImage": "./assets/images/logo-presiva.png"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false,
+      "package": "com.renaldinurmazid.Presiva"
+    },
+    "web": {
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/logo-presiva.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff",
+          "dark": {
+            "backgroundColor": "#000000"
+          }
+        }
+      ],
+      "expo-secure-store",
+      "@react-native-community/datetimepicker"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "d7f0d9bb-5faf-4024-ad64-19aff2726cfb"
+      }
+    }
+  }
+}
