@@ -4,7 +4,6 @@ import {
   Alert,
   Image,
   RefreshControl,
-  SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -12,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useFocusEffect, useRouter } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
 import * as Location from 'expo-location'
@@ -30,6 +30,7 @@ import { useAuthStore } from '@/store/auth.store'
 export default function AbsensiScreen() {
   const router = useRouter()
   const user = useAuthStore((state) => state.user)
+  const insets = useSafeAreaInsets()
 
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
@@ -293,7 +294,7 @@ export default function AbsensiScreen() {
     [router]
   )
 
-  const handleSelectLokasi = useCallback(async (item: LokasiAbsensi) => {
+  const handleSelectLokasi = useCallback(async (item: LokasiAbsensi | null) => {
     setSelectedLokasi(item)
     setSelfieUri(null)
     setSelfieBase64(null)
@@ -397,9 +398,9 @@ export default function AbsensiScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
+      <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} translucent />
 
-      <View style={styles.headerBackground}>
+      <View style={[styles.headerBackground, { paddingTop: insets.top }]}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
             <Ionicons name="arrow-back" size={24} color="#FFF" />

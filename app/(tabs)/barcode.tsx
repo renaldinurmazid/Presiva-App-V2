@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, StatusBar, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useFocusEffect } from 'expo-router';
 import QRCode from 'react-native-qrcode-svg';
@@ -10,8 +10,9 @@ import { api } from '@/services/api';
 
 export default function BarcodeScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState({ qr_string: '', nama_mitra: '', alamat_mitra: '' });
+  const [data, setData] = useState({ qr_string: '', nama_pegawai: '', nama_mitra: '', alamat_mitra: '' });
 
   const loadData = useCallback(async (showLoading = true) => {
     try {
@@ -49,9 +50,9 @@ export default function BarcodeScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
+      <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} translucent />
 
-      <View style={styles.headerBackground}>
+      <View style={[styles.headerBackground, { paddingTop: insets.top }]}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
             <Ionicons name="arrow-back" size={24} color="#FFF" />

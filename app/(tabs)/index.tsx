@@ -3,11 +3,12 @@ import {
   View,
   StyleSheet,
   ScrollView,
-  SafeAreaView,
   StatusBar,
   ActivityIndicator,
   RefreshControl,
+  Platform,
 } from 'react-native'
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 import { COLORS } from '@/constants/colors'
 import DashboardHeader from '@/components/home/DashboardHeader'
@@ -21,6 +22,7 @@ import { setAuthToken } from '@/services/api'
 
 export default function HomeScreen() {
   const router = useRouter()
+  const insets = useSafeAreaInsets()
 
   const user = useAuthStore((state) => state.user)
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
@@ -148,10 +150,10 @@ const menus = useMemo<HomeMenuItem[]>(() => {
   }, [router, user?.role])
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
+    <View style={styles.safeArea}>
+      <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} translucent />
 
-      <View style={styles.headerBackground}>
+      <View style={[styles.headerBackground, { paddingTop: insets.top }]}>
         <DashboardHeader />
         <ProfileSummaryCard
           namaPegawai={user?.nama_pegawai || '-'}
@@ -180,7 +182,7 @@ const menus = useMemo<HomeMenuItem[]>(() => {
           </ScrollView>
         )}
       </View>
-    </SafeAreaView>
+    </View>
   )
 }
 

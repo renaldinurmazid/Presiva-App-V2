@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Stack, usePathname, useRouter } from 'expo-router'
 import { ActivityIndicator, View, StyleSheet } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { useAuthStore } from '@/store/auth.store'
 import { COLORS } from '@/constants/colors'
 import { setAuthToken } from '@/services/api'
@@ -18,12 +19,16 @@ export default function RootLayout() {
 
   useEffect(() => {
     const init = async () => {
-      await restoreSession()
+      try {
+        await restoreSession()
+      } catch {
+        // Session restore failed, will redirect to login
+      }
       setIsReady(true)
     }
 
     init()
-  }, [restoreSession])
+  }, []) // Remove restoreSession from deps to avoid re-triggering
 
   useEffect(() => {
     if (!isReady) return
@@ -39,7 +44,6 @@ export default function RootLayout() {
     if (!isReady) return
 
     const isAuthRoute = pathname.startsWith('/auth')
-    const isTabsRoute = pathname.startsWith('/(tabs)')
 
     if (!isAuthenticated && !isAuthRoute) {
       router.replace('/auth/login')
@@ -50,26 +54,26 @@ export default function RootLayout() {
       router.replace('/(tabs)')
       return
     }
-
-    if (isAuthenticated && !isTabsRoute && pathname === '/') {
-      router.replace('/(tabs)')
-    }
   }, [isReady, isAuthenticated, pathname, router])
 
   if (!isReady) {
     return (
-      <GestureHandlerRootView style={styles.root}>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={COLORS.primary} />
-        </View>
-      </GestureHandlerRootView>
+      <SafeAreaProvider>
+        <GestureHandlerRootView style={styles.root}>
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={COLORS.primary} />
+          </View>
+        </GestureHandlerRootView>
+      </SafeAreaProvider>
     )
   }
 
   return (
-    <GestureHandlerRootView style={styles.root}>
-      <Stack screenOptions={{ headerShown: false }} />
-    </GestureHandlerRootView>
+    <SafeAreaProvider>
+      <GestureHandlerRootView style={styles.root}>
+        <Stack screenOptions={{ headerShown: false }} />
+      </GestureHandlerRootView>
+    </SafeAreaProvider>
   )
 }
 

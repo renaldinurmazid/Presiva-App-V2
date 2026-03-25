@@ -5,8 +5,9 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
-  SafeAreaView,
+  StatusBar,
 } from 'react-native'
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { COLORS } from '@/constants/colors'
 import { useAuthStore } from '@/store/auth.store'
@@ -18,6 +19,7 @@ export default function AbsensiSuccessScreen() {
   const router = useRouter()
   const params = useLocalSearchParams()
   const user = useAuthStore((state) => state.user)
+  const insets = useSafeAreaInsets()
 
   const foto = params.foto as string
   const namaLokasi = params.nama_lokasi as string
@@ -45,8 +47,9 @@ export default function AbsensiSuccessScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} translucent />
       {/* HEADER (SAMA DENGAN HOME) */}
-      <View style={styles.headerBackground}>
+      <View style={[styles.headerBackground, { paddingTop: insets.top }]}>
         <DashboardHeader />
 
         <ProfileSummaryCard

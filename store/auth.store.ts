@@ -5,7 +5,10 @@ type AuthUser = {
   id_pegawai: string | number
   id_mitra: string | number
   nama_pegawai: string
+  nama_mitra?: string | null
   email?: string
+  no_telp?: string | null
+  foto?: string | null
   role?: string
   id_lokasi_absen_default?: string | number
 }
@@ -46,30 +49,45 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   restoreSession: async () => {
-    const access_token = await SecureStore.getItemAsync('access_token')
-    const expired_at = await SecureStore.getItemAsync('expired_at')
-    const userRaw = await SecureStore.getItemAsync('user')
+    try {
+      const access_token = await SecureStore.getItemAsync('access_token')
+      const expired_at = await SecureStore.getItemAsync('expired_at')
+      const userRaw = await SecureStore.getItemAsync('user')
 
-    const user = userRaw ? JSON.parse(userRaw) : null
-
-    if (access_token && expired_at && user) {
-      const expiredTime = new Date(expired_at).getTime()
-      const now = Date.now()
-
-      if (expiredTime > now) {
-        set({
-          access_token,
-          expired_at,
-          user,
-          isAuthenticated: true,
-        })
-        return
+      let user = null
+      if (userRaw) {
+        try {
+          user = JSON.parse(userRaw)
+        } catch {
+          user = null
+        }
       }
+
+      if (access_token && expired_at && user) {
+        const expiredTime = new Date(expired_at).getTime()
+        const now = Date.now()
+
+        if (expiredTime > now) {
+          set({
+            access_token,
+            expired_at,
+            user,
+            isAuthenticated: true,
+          })
+          return
+        }
+      }
+    } catch {
+      // Ignore SecureStore read errors
     }
 
-    await SecureStore.deleteItemAsync('access_token')
-    await SecureStore.deleteItemAsync('expired_at')
-    await SecureStore.deleteItemAsync('user')
+    try {
+      await SecureStore.deleteItemAsync('access_token')
+      await SecureStore.deleteItemAsync('expired_at')
+      await SecureStore.deleteItemAsync('user')
+    } catch {
+      // Ignore SecureStore delete errors
+    }
 
     set({
       access_token: null,

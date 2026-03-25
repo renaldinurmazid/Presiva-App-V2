@@ -3,12 +3,14 @@ import React from 'react'
 import { Ionicons } from '@expo/vector-icons'
 import { COLORS } from '@/constants/colors'
 import { useAuthStore } from '@/store/auth.store'
-import { Alert } from 'react-native'
+import { Alert, Platform } from 'react-native'
 import { setAuthToken } from '@/services/api'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 export default function TabsLayout() {
   const clearSession = useAuthStore((state) => state.clearSession)
   const router = useRouter()
+  const insets = useSafeAreaInsets()
 
   const handleLogout = () => {
     Alert.alert(
@@ -21,13 +23,16 @@ export default function TabsLayout() {
           style: 'destructive',
           onPress: async () => {
             await clearSession()
-            setAuthToken(null)
+            setAuthToken(undefined)
             router.replace('/auth/login')
           },
         },
       ]
     )
   }
+
+  // Calculate proper tab bar height accounting for bottom insets (navigation bar)
+  const tabBarHeight = 60 + insets.bottom
 
   return (
     <Tabs
@@ -36,8 +41,9 @@ export default function TabsLayout() {
         tabBarActiveTintColor: COLORS.primary,
         tabBarInactiveTintColor: '#999',
         tabBarStyle: {
-          height: 60,
-          paddingBottom: 8,
+          height: tabBarHeight,
+          paddingBottom: insets.bottom + 8,
+          paddingTop: 8,
         },
         tabBarLabelStyle: {
           fontSize: 12,

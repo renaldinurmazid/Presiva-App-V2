@@ -4,13 +4,14 @@ import {
   Alert,
   Image,
   RefreshControl,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  StatusBar,
 } from 'react-native'
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useFocusEffect, useRouter } from 'expo-router'
 import * as Location from 'expo-location'
 import * as Device from 'expo-device'
@@ -32,6 +33,7 @@ import { useAuthStore } from '@/store/auth.store'
 export default function AbsensiScreen() {
   const router = useRouter()
   const user = useAuthStore((state) => state.user)
+  const insets = useSafeAreaInsets()
 
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
@@ -343,7 +345,8 @@ export default function AbsensiScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.headerBackground}>
+      <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} translucent />
+      <View style={[styles.headerBackground, { paddingTop: insets.top }]}>
         <DashboardHeader />
 
         <ProfileSummaryCard
