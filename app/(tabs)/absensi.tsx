@@ -50,10 +50,12 @@ export default function AbsensiScreen() {
 
   const cameraRef = useRef<CameraView | null>(null)
   const locationSubscriptionRef = useRef<Location.LocationSubscription | null>(null)
+  const isMounted = useRef(true)
 
   const [cameraPermission, requestCameraPermission] = useCameraPermissions()
 
   const updateClock = useCallback(() => {
+    if (!isMounted.current) return
     const now = new Date()
     const formatted = now.toLocaleTimeString('id-ID', {
       hour: '2-digit',
@@ -84,33 +86,42 @@ export default function AbsensiScreen() {
   }, [])
 
   const startLocationWatcher = useCallback(async () => {
-    if (locationSubscriptionRef.current) {
-      locationSubscriptionRef.current.remove()
-      locationSubscriptionRef.current = null
-    }
-
-    const permission = await Location.requestForegroundPermissionsAsync()
-    if (permission.status !== 'granted') {
-      throw new Error('Izin lokasi ditolak. Aktifkan GPS untuk melakukan absensi.')
-    }
-
-    await getLatestLocation()
-
-    const watcher = await Location.watchPositionAsync(
-      {
-        accuracy: Location.Accuracy.BestForNavigation,
-        timeInterval: 2000,
-        distanceInterval: 1,
-      },
-      (loc) => {
-        setCurrentLocation({
-          latitude: loc.coords.latitude,
-          longitude: loc.coords.longitude,
-        })
+    try {
+      if (locationSubscriptionRef.current) {
+        locationSubscriptionRef.current.remove()
+        locationSubscriptionRef.current = null
       }
-    )
 
-    locationSubscriptionRef.current = watcher
+      const permission = await Location.requestForegroundPermissionsAsync()
+      if (permission.status !== 'granted') {
+        throw new Error('Izin lokasi ditolak. Aktifkan GPS untuk melakukan absensi.')
+      }
+
+      await getLatestLocation()
+      if (!isMounted.current) return
+
+      const watcher = await Location.watchPositionAsync(
+        {
+          accuracy: Location.Accuracy.Balanced,
+          timeInterval: 5000,
+          distanceInterval: 5,
+        },
+        (loc) => {
+          if (isMounted.current) {
+            setCurrentLocation({
+              latitude: loc.coords.latitude,
+              longitude: loc.coords.longitude,
+            })
+          }
+        }
+      )
+
+      locationSubscriptionRef.current = watcher
+    } catch (error) {
+      console.error('Error starting location watcher:', error)
+      // Throwing error here so initScreen can catch and show alert
+      throw error
+    }
   }, [getLatestLocation])
 
   const ensureCameraPermission = useCallback(async () => {
@@ -198,11 +209,19 @@ export default function AbsensiScreen() {
     }
   }, [getLatestLocation, loadInitialData, resetScreenState])
 
+  const handleCameraReady = useCallback(() => {
+    if (isMounted.current) {
+      setCameraReady(true)
+    }
+  }, [])
+
   useFocusEffect(
     useCallback(() => {
+      isMounted.current = true
       initScreen()
 
       return () => {
+        isMounted.current = false
         if (locationSubscriptionRef.current) {
           locationSubscriptionRef.current.remove()
           locationSubscriptionRef.current = null
@@ -438,7 +457,7 @@ export default function AbsensiScreen() {
                   ref={cameraRef}
                   style={styles.camera}
                   facing="front"
-                  onCameraReady={() => setCameraReady(true)}
+                  onCameraReady={handleCameraReady}
                 />
               ) : (
                 <View style={styles.cameraPlaceholder}>

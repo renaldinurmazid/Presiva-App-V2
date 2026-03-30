@@ -2,9 +2,9 @@
   "expo": {
     "name": "Presiva",
     "slug": "Presiva",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "orientation": "portrait",
-    "icon": "./assets/images/logo-presiva.png",
+    "icon": "./assets/logo/favicon.png",
     "scheme": "presiva",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -15,9 +15,9 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/logo-presiva.png",
-        "backgroundImage": "./assets/images/logo-presiva.png",
-        "monochromeImage": "./assets/images/logo-presiva.png"
+        "foregroundImage": "./assets/logo/favicon.png",
+        "backgroundImage": "./assets/logo/favicon.png",
+        "monochromeImage": "./assets/logo/favicon.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
@@ -25,14 +25,14 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/logo/favicon.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/logo-presiva.png",
+          "image": "./assets/logo/favicon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",
@@ -42,7 +42,21 @@
         }
       ],
       "expo-secure-store",
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Presiva membutuhkan akses kamera untuk selfie absensi."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Presiva membutuhkan akses lokasi untuk verifikasi absensi.",
+          "locationAlwaysPermission": "Presiva membutuhkan akses lokasi untuk verifikasi absensi.",
+          "locationWhenInUsePermission": "Presiva membutuhkan akses lokasi untuk verifikasi absensi."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
