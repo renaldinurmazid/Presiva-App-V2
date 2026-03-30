@@ -154,7 +154,6 @@ const menus = useMemo<HomeMenuItem[]>(() => {
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} translucent />
 
       <View style={[styles.headerBackground, { paddingTop: insets.top }]}>
-        <DashboardHeader />
         <ProfileSummaryCard
           namaPegawai={user?.nama_pegawai || '-'}
           namaMitra={user?.nama_mitra || '-'}

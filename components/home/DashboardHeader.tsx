@@ -14,12 +14,7 @@ export default function DashboardHeader({
 }: Props) {
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.menuButton} onPress={onMenuPress}>
-        <Ionicons name="menu-outline" size={28} color={COLORS.white} />
-      </TouchableOpacity>
-
       <Text style={styles.title}>{title}</Text>
-
       <View style={styles.rightPlaceholder} />
     </View>
   );

@@ -52,7 +52,7 @@ export default function BarcodeScreen() {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} translucent />
 
-      <View style={[styles.headerBackground, { paddingTop: insets.top }]}>
+      <View style={[styles.headerBackground, { paddingTop: 8 }]}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
             <Ionicons name="arrow-back" size={24} color="#FFF" />

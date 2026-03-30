@@ -418,14 +418,12 @@ export default function AbsensiScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} translucent />
-
-      <View style={[styles.headerBackground, { paddingTop: insets.top }]}>
+      <View style={[styles.headerBackground, { paddingTop: 8 }]}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
             <Ionicons name="arrow-back" size={24} color="#FFF" />
           </TouchableOpacity>
           <View>
-            <Text style={styles.headerSubtitle}></Text>
             <Text style={styles.headerTitle}>Absensi Pegawai</Text>
           </View>
         </View>

@@ -6,11 +6,13 @@ import {
   Image,
   TouchableOpacity,
   StatusBar,
+  ScrollView,
 } from 'react-native'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { COLORS } from '@/constants/colors'
 import { useAuthStore } from '@/store/auth.store'
+import { Ionicons } from '@expo/vector-icons'
 
 import DashboardHeader from '@/components/home/DashboardHeader'
 import ProfileSummaryCard from '@/components/home/ProfileSummaryCard'
@@ -37,20 +39,24 @@ export default function AbsensiSuccessScreen() {
       })
     : '-'
 
-  // Optional auto redirect
-  // useEffect(() => {
-  //   const t = setTimeout(() => {
-  //     router.replace('/(tabs)')
-  //   }, 3000)
-  //   return () => clearTimeout(t)
-  // }, [])
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} translucent />
-      {/* HEADER (SAMA DENGAN HOME) */}
+      
+      {/* HEADER SECTION */}
       <View style={[styles.headerBackground, { paddingTop: insets.top }]}>
-        <DashboardHeader />
+        <View style={styles.headerTop}>
+          <View style={{ flex: 1 }}>
+            <DashboardHeader title="Konfirmasi" />
+          </View>
+          <TouchableOpacity
+            style={styles.homeButton}
+            onPress={() => router.replace('/(tabs)')}
+          >
+            <Ionicons name="home-outline" size={18} color="#fff" />
+            <Text style={styles.homeButtonText}>Home</Text>
+          </TouchableOpacity>
+        </View>
 
         <ProfileSummaryCard
           namaPegawai={user?.nama_pegawai || '-'}
@@ -58,59 +64,86 @@ export default function AbsensiSuccessScreen() {
           noTelp={user?.no_telp || '-'}
           foto={user?.foto || null}
         />
-
-        <TouchableOpacity
-          style={styles.backButtonFloating}
-          onPress={() => router.replace('/(tabs)')}
-        >
-          <Text style={styles.backButtonText}>← Home</Text>
-        </TouchableOpacity>
       </View>
 
-      {/* CONTENT */}
-      <View style={styles.contentContainer}>
-        <View style={styles.container}>
-
-          {/* TITLE */}
+      {/* CONTENT AREA */}
+      <ScrollView 
+        style={styles.contentContainer}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.successBadgeContainer}>
+          <View style={styles.successIconCircle}>
+            <Ionicons name="checkmark-sharp" size={40} color={COLORS.success} />
+          </View>
           <Text style={styles.title}>Absensi Berhasil</Text>
           <Text style={styles.subtitle}>
-            Data absensi Anda telah tersimpan
+            Data absensi Anda telah tersimpan dengan aman di sistem.
           </Text>
+        </View>
 
-          {/* CARD */}
-          <View style={styles.card}>
-            {foto ? (
-              <Image source={{ uri: foto }} style={styles.image} />
-            ) : null}
-
-            <View style={styles.infoGroup}>
-              <Text style={styles.label}>Lokasi</Text>
-              <Text style={styles.value}>{namaLokasi || '-'}</Text>
-              {alamat ? (
-                <Text style={styles.address}>{alamat}</Text>
-              ) : null}
-            </View>
-
-            <View style={styles.infoGroup}>
-              <Text style={styles.label}>Waktu</Text>
-              <Text style={styles.value}>{formattedTime}</Text>
-            </View>
-
-            <View style={styles.infoGroup}>
-              <Text style={styles.label}>Jarak</Text>
-              <Text style={styles.value}>{distance} meter</Text>
-            </View>
+        {/* DETAILS CARD */}
+        <View style={styles.card}>
+          <View style={styles.cardHeader}>
+            <Text style={styles.cardTitle}>Detail Absensi</Text>
           </View>
 
-          {/* BUTTON */}
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => router.replace('/(tabs)')}
-          >
-            <Text style={styles.buttonText}>Kembali ke Home</Text>
-          </TouchableOpacity>
+          {foto ? (
+            <Image source={{ uri: foto }} style={styles.image} />
+          ) : (
+            <View style={styles.noImagePlaceholder}>
+              <Ionicons name="image-outline" size={32} color={COLORS.muted} />
+              <Text style={styles.noImageText}>Tidak ada foto</Text>
+            </View>
+          )}
+
+          <View style={styles.detailsContainer}>
+            <View style={styles.infoRow}>
+              <View style={styles.iconBox}>
+                <Ionicons name="location" size={18} color={COLORS.primary} />
+              </View>
+              <View style={styles.infoText}>
+                <Text style={styles.label}>Lokasi Absensi</Text>
+                <Text style={styles.value}>{namaLokasi || '-'}</Text>
+                {alamat ? (
+                  <Text style={styles.address}>{alamat}</Text>
+                ) : null}
+              </View>
+            </View>
+
+            <View style={styles.infoRow}>
+              <View style={styles.iconBox}>
+                <Ionicons name="time" size={18} color={COLORS.primary} />
+              </View>
+              <View style={styles.infoText}>
+                <Text style={styles.label}>Waktu</Text>
+                <Text style={styles.value}>{formattedTime}</Text>
+              </View>
+            </View>
+
+            <View style={styles.infoRow}>
+              <View style={styles.iconBox}>
+                <Ionicons name="navigate" size={18} color={COLORS.primary} />
+              </View>
+              <View style={styles.infoText}>
+                <Text style={styles.label}>Jarak ke Lokasi</Text>
+                <Text style={styles.value}>{distance} meter</Text>
+              </View>
+            </View>
+          </View>
         </View>
-      </View>
+
+        {/* ACTION BUTTON */}
+        <TouchableOpacity
+          style={styles.primaryButton}
+          onPress={() => router.replace('/(tabs)')}
+        >
+          <Text style={styles.primaryButtonText}>Selesai & Keluar</Text>
+          <Ionicons name="arrow-forward" size={18} color="#fff" style={{ marginLeft: 8 }} />
+        </TouchableOpacity>
+        
+        <View style={{ height: 40 }} />
+      </ScrollView>
     </SafeAreaView>
   )
 }
@@ -123,108 +156,195 @@ const styles = StyleSheet.create({
 
   headerBackground: {
     backgroundColor: COLORS.primary,
-    paddingBottom: 28,
-    borderBottomRightRadius: 44,
+    paddingBottom: 32,
+    borderBottomRightRadius: 40,
+    zIndex: 10,
+  },
+
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingRight: 20,
+  },
+
+  homeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    marginTop: 10,
+  },
+
+  homeButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 13,
+    marginLeft: 6,
   },
 
   contentContainer: {
     flex: 1,
-    backgroundColor: '#f5f7fb',
-    borderTopLeftRadius: 34,
-    marginTop: -6,
-    paddingTop: 8,
+    backgroundColor: '#F8FAFC',
+    borderTopLeftRadius: 36,
+    marginTop: -24,
   },
 
-  container: {
-    flex: 1,
-    padding: 16,
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 40,
+    paddingBottom: 24,
+  },
+
+  successBadgeContainer: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+
+  successIconCircle: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: '#D1FAE5',
     justifyContent: 'center',
-  },
-
-  backButtonFloating: {
-    position: 'absolute',
-    top: 16,
-    left: 16,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 10,
-  },
-
-  backButtonText: {
-    color: '#fff',
-    fontWeight: '700',
-    fontSize: 12,
-  },
-
-  icon: {
-    fontSize: 60,
-    textAlign: 'center',
-    marginBottom: 10,
+    alignItems: 'center',
+    marginBottom: 16,
+    shadowColor: COLORS.success,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
 
   title: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: '800',
-    textAlign: 'center',
-    color: '#0f172a',
+    color: '#1E293B',
+    marginBottom: 8,
+    letterSpacing: -0.5,
   },
 
   subtitle: {
+    fontSize: 15,
+    color: COLORS.textSecondary,
     textAlign: 'center',
-    color: '#64748b',
-    marginBottom: 20,
+    paddingHorizontal: 20,
+    lineHeight: 22,
   },
 
   card: {
     backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 16,
-    marginBottom: 20,
+    borderRadius: 24,
+    marginBottom: 24,
     shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 4,
+    shadowOpacity: 0.06,
+    shadowRadius: 15,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 5,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#F1F5F9',
+  },
+
+  cardHeader: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F1F5F9',
+    backgroundColor: '#FCFDFF',
+  },
+
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#475569',
   },
 
   image: {
     width: '100%',
-    height: 200,
-    borderRadius: 14,
-    marginBottom: 12,
+    height: 220,
+    backgroundColor: '#F1F5F9',
   },
 
-  infoGroup: {
-    marginTop: 10,
+  noImagePlaceholder: {
+    width: '100%',
+    height: 180,
+    backgroundColor: '#F8FAFC',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  noImageText: {
+    color: COLORS.muted,
+    fontSize: 14,
+    marginTop: 8,
+  },
+
+  detailsContainer: {
+    padding: 20,
+  },
+
+  infoRow: {
+    flexDirection: 'row',
+    marginBottom: 20,
+  },
+
+  iconBox: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    backgroundColor: '#EFF6FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+
+  infoText: {
+    flex: 1,
   },
 
   label: {
     fontSize: 12,
-    color: '#64748b',
+    color: '#94A3B8',
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 4,
   },
 
   value: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '700',
-    color: '#0f172a',
+    color: '#1E293B',
+    lineHeight: 22,
   },
 
   address: {
-    fontSize: 13,
-    color: '#64748b',
+    fontSize: 14,
+    color: '#64748B',
+    marginTop: 4,
+    lineHeight: 20,
   },
 
-  button: {
+  primaryButton: {
     backgroundColor: COLORS.accentOrange,
-    paddingVertical: 14,
-    borderRadius: 16,
+    paddingVertical: 16,
+    borderRadius: 18,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: COLORS.accentOrange,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 8,
   },
 
-  buttonText: {
+  primaryButtonText: {
     color: '#fff',
     fontWeight: '800',
-    fontSize: 14,
+    fontSize: 16,
   },
 })
