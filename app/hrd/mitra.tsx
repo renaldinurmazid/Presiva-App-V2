@@ -48,7 +48,12 @@ export default function MitraScreen() {
 		  if (data.jam_masuk) data.jam_masuk = data.jam_masuk.substring(0,5);
 		  if (data.jam_keluar) data.jam_keluar = data.jam_keluar.substring(0,5);
 		  
-		  setForm(data)
+		  // Konversi ke string agar TextInput bisa menampilkan nilainya
+		  setForm({
+			...data,
+			tanggal_awal_periode: data.tanggal_awal_periode?.toString() || '',
+			tanggal_akhir_periode: data.tanggal_akhir_periode?.toString() || '',
+		  })
 		}
 	  } catch (error) {
 		Alert.alert('Error', 'Gagal memuat profil')
@@ -82,9 +87,9 @@ export default function MitraScreen() {
       <View style={styles.contentContainer}>
         <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 100 }}>
           <Text style={styles.sectionTitle}>Informasi Umum</Text>
-          <TextInput placeholder="Nama Mitra" style={styles.input} value={form.nama_mitra} onChangeText={t => setForm({...form, nama_mitra: t})} />
-          <TextInput placeholder="No. Telepon" style={styles.input} keyboardType="phone-pad" value={form.no_telp_mitra} onChangeText={t => setForm({...form, no_telp_mitra: t})} />
-          <TextInput placeholder="Alamat" style={[styles.input, {height: 80}]} multiline value={form.alamat_mitra} onChangeText={t => setForm({...form, alamat_mitra: t})} />
+          <TextInput placeholder="Nama Mitra" style={styles.input} placeholderTextColor="#6B7280" value={form.nama_mitra} onChangeText={t => setForm({...form, nama_mitra: t})} />
+          <TextInput placeholder="No. Telepon" style={styles.input} placeholderTextColor="#6B7280" keyboardType="phone-pad" value={form.no_telp_mitra} onChangeText={t => setForm({...form, no_telp_mitra: t})} />
+          <TextInput placeholder="Alamat" style={[styles.input, {height: 80}]} placeholderTextColor="#6B7280" multiline value={form.alamat_mitra} onChangeText={t => setForm({...form, alamat_mitra: t})} />
 
           <Text style={styles.sectionTitle}>Default Jam Kerja</Text>
           <View style={styles.row}>
@@ -112,20 +117,20 @@ export default function MitraScreen() {
             <View style={styles.cardBox}>
               <Text style={styles.boxLabel}>Cut-off Tanggal (Bulanan)</Text>
               <View style={styles.row}>
-                <TextInput placeholder="Tgl Awal (Misal: 26)" style={[styles.input, {flex:1}]} keyboardType="numeric" value={form.tanggal_awal_periode} onChangeText={t => setForm({...form, tanggal_awal_periode: t})} />
-                <TextInput placeholder="Tgl Akhir (Misal: 25)" style={[styles.input, {flex:1}]} keyboardType="numeric" value={form.tanggal_akhir_periode} onChangeText={t => setForm({...form, tanggal_akhir_periode: t})} />
+                <TextInput placeholder="Tgl Awal (Misal: 26)" style={[styles.input, {flex:1}]} placeholderTextColor="#6B7280" keyboardType="numeric" value={form.tanggal_awal_periode?.toString()} onChangeText={t => setForm({...form, tanggal_awal_periode: t})} />
+                <TextInput placeholder="Tgl Akhir (Misal: 25)" style={[styles.input, {flex:1}]} placeholderTextColor="#6B7280" keyboardType="numeric" value={form.tanggal_akhir_periode?.toString()} onChangeText={t => setForm({...form, tanggal_akhir_periode: t})} />
               </View>
             </View>
           ) : (
             <View style={styles.cardBox}>
               <Text style={styles.boxLabel}>Rentang Hari (Pekanan)</Text>
               <View style={styles.pickerRow}>
-                <Picker style={{flex:1}} selectedValue={form.hari_awal} onValueChange={v => setForm({...form, hari_awal: v})}>
-                  {DAFTAR_HARI.map(h => <Picker.Item key={h} label={h} value={h} />)}
+                <Picker style={{flex:1, color: '#111827'}} dropdownIconColor="#111827" selectedValue={form.hari_awal} onValueChange={v => setForm({...form, hari_awal: v})}>
+                  {DAFTAR_HARI.map(h => <Picker.Item key={h} label={h} value={h} color="#111827" />)}
                 </Picker>
-                <Ionicons name="arrow-forward" size={20} color="#CCC" />
-                <Picker style={{flex:1}} selectedValue={form.hari_akhir} onValueChange={v => setForm({...form, hari_akhir: v})}>
-                  {DAFTAR_HARI.map(h => <Picker.Item key={h} label={h} value={h} />)}
+                <Ionicons name="arrow-forward" size={20} color="#6B7280" />
+                <Picker style={{flex:1, color: '#111827'}} dropdownIconColor="#111827" selectedValue={form.hari_akhir} onValueChange={v => setForm({...form, hari_akhir: v})}>
+                  {DAFTAR_HARI.map(h => <Picker.Item key={h} label={h} value={h} color="#111827" />)}
                 </Picker>
               </View>
             </View>
@@ -162,7 +167,7 @@ const styles = StyleSheet.create({
   contentContainer: { flex: 1, backgroundColor: '#f5f7fb', borderTopLeftRadius: 34, marginTop: -6 },
   content: { padding: 20 },
   sectionTitle: { fontSize: 14, fontWeight: '800', color: '#4B5563', marginTop: 20, marginBottom: 10, textTransform: 'uppercase' },
-  input: { backgroundColor: '#FFF', borderWidth: 1, borderColor: '#E5E7EB', borderRadius: 14, padding: 14, marginBottom: 12, fontSize: 15 },
+  input: { backgroundColor: '#FFF', borderWidth: 1, borderColor: '#E5E7EB', borderRadius: 14, padding: 14, marginBottom: 12, fontSize: 15, color: '#111827' },
   row: { flexDirection: 'row', gap: 12 },
   timeBtn: { flex: 1, backgroundColor: '#FFF', padding: 14, borderRadius: 14, borderWidth: 1, borderColor: '#E5E7EB', alignItems: 'center' },
   timeLabel: { fontSize: 11, color: '#6B7280', fontWeight: 'bold' },

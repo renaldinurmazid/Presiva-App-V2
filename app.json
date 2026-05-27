@@ -8,6 +8,12 @@
     "scheme": "presiva",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "updates": {
+      "url": "https://u.expo.dev/d7f0d9bb-5faf-4024-ad64-19aff2726cfb"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.renaldinurmazid.Presiva"

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -10,95 +10,106 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from 'react-native'
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useFocusEffect, useRouter } from 'expo-router'
-import { Ionicons } from '@expo/vector-icons'
-import * as Location from 'expo-location'
-import * as Device from 'expo-device'
-import { CameraView, useCameraPermissions } from 'expo-camera'
+} from "react-native";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
+import { useFocusEffect, useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import * as Location from "expo-location";
+import * as Device from "expo-device";
+import { CameraView, useCameraPermissions } from "expo-camera";
 
-import { COLORS } from '@/constants/colors'
-import AbsensiMap from '@/components/absensi/AbsensiMap'
-import LokasiPicker from '@/components/absensi/LokasiPicker'
-import JarakInfoCard from '@/components/absensi/JarakInfoCard'
-import { getLokasiAbsensi, createAbsensi } from '@/services/absensi.service'
-import { haversineDistance } from '@/utils/distance'
-import { LokasiAbsensi, UserCoordinate } from '@/types/absensi'
-import { useAuthStore } from '@/store/auth.store'
+import { COLORS } from "@/constants/colors";
+import AbsensiMap from "@/components/absensi/AbsensiMap";
+import LokasiPicker from "@/components/absensi/LokasiPicker";
+import JarakInfoCard from "@/components/absensi/JarakInfoCard";
+import { getLokasiAbsensi, createAbsensi } from "@/services/absensi.service";
+import { haversineDistance } from "@/utils/distance";
+import { LokasiAbsensi, UserCoordinate } from "@/types/absensi";
+import { useAuthStore } from "@/store/auth.store";
 
 export default function AbsensiScreen() {
-  const router = useRouter()
-  const user = useAuthStore((state) => state.user)
-  const insets = useSafeAreaInsets()
+  const router = useRouter();
+  const user = useAuthStore((state) => state.user);
+  const insets = useSafeAreaInsets();
 
-  const [loading, setLoading] = useState(true)
-  const [refreshing, setRefreshing] = useState(false)
-  const [submitting, setSubmitting] = useState(false)
-  const [cameraLoading, setCameraLoading] = useState(false)
-  const [cameraReady, setCameraReady] = useState(false)
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [cameraLoading, setCameraLoading] = useState(false);
+  const [cameraReady, setCameraReady] = useState(false);
 
-  const [currentTime, setCurrentTime] = useState('')
-  const [currentLocation, setCurrentLocation] = useState<UserCoordinate | null>(null)
-  const [lokasiList, setLokasiList] = useState<LokasiAbsensi[]>([])
-  const [selectedLokasi, setSelectedLokasi] = useState<LokasiAbsensi | null>(null)
+  const [currentTime, setCurrentTime] = useState("");
+  const [currentLocation, setCurrentLocation] = useState<UserCoordinate | null>(
+    null,
+  );
+  const [lokasiList, setLokasiList] = useState<LokasiAbsensi[]>([]);
+  const [selectedLokasi, setSelectedLokasi] = useState<LokasiAbsensi | null>(
+    null,
+  );
 
-  const [selfieUri, setSelfieUri] = useState<string | null>(null)
-  const [selfieBase64, setSelfieBase64] = useState<string | null>(null)
-  const [selfieChecked, setSelfieChecked] = useState(false)
-  const [hasTakenSelfie, setHasTakenSelfie] = useState(false)
+  const [selfieUri, setSelfieUri] = useState<string | null>(null);
+  const [selfieBase64, setSelfieBase64] = useState<string | null>(null);
+  const [selfieChecked, setSelfieChecked] = useState(false);
+  const [hasTakenSelfie, setHasTakenSelfie] = useState(false);
 
-  const cameraRef = useRef<CameraView | null>(null)
-  const locationSubscriptionRef = useRef<Location.LocationSubscription | null>(null)
-  const isMounted = useRef(true)
+  const cameraRef = useRef<CameraView | null>(null);
+  const locationSubscriptionRef = useRef<Location.LocationSubscription | null>(
+    null,
+  );
+  const isMounted = useRef(true);
 
-  const [cameraPermission, requestCameraPermission] = useCameraPermissions()
+  const [cameraPermission, requestCameraPermission] = useCameraPermissions();
 
   const updateClock = useCallback(() => {
-    if (!isMounted.current) return
-    const now = new Date()
-    const formatted = now.toLocaleTimeString('id-ID', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    })
-    setCurrentTime(formatted)
-  }, [])
+    if (!isMounted.current) return;
+    const now = new Date();
+    const formatted = now.toLocaleTimeString("id-ID", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
+    setCurrentTime(formatted);
+  }, []);
 
   useEffect(() => {
-    updateClock()
-    const interval = setInterval(updateClock, 1000)
-    return () => clearInterval(interval)
-  }, [updateClock])
+    updateClock();
+    const interval = setInterval(updateClock, 1000);
+    return () => clearInterval(interval);
+  }, [updateClock]);
 
   const getLatestLocation = useCallback(async () => {
     const loc = await Location.getCurrentPositionAsync({
       accuracy: Location.Accuracy.High,
-    })
+    });
 
     const coords = {
       latitude: loc.coords.latitude,
       longitude: loc.coords.longitude,
-    }
+    };
 
-    setCurrentLocation(coords)
-    return coords
-  }, [])
+    setCurrentLocation(coords);
+    return coords;
+  }, []);
 
   const startLocationWatcher = useCallback(async () => {
     try {
       if (locationSubscriptionRef.current) {
-        locationSubscriptionRef.current.remove()
-        locationSubscriptionRef.current = null
+        locationSubscriptionRef.current.remove();
+        locationSubscriptionRef.current = null;
       }
 
-      const permission = await Location.requestForegroundPermissionsAsync()
-      if (permission.status !== 'granted') {
-        throw new Error('Izin lokasi ditolak. Aktifkan GPS untuk melakukan absensi.')
+      const permission = await Location.requestForegroundPermissionsAsync();
+      if (permission.status !== "granted") {
+        throw new Error(
+          "Izin lokasi ditolak. Aktifkan GPS untuk melakukan absensi.",
+        );
       }
 
-      await getLatestLocation()
-      if (!isMounted.current) return
+      await getLatestLocation();
+      if (!isMounted.current) return;
 
       const watcher = await Location.watchPositionAsync(
         {
@@ -111,159 +122,159 @@ export default function AbsensiScreen() {
             setCurrentLocation({
               latitude: loc.coords.latitude,
               longitude: loc.coords.longitude,
-            })
+            });
           }
-        }
-      )
+        },
+      );
 
-      locationSubscriptionRef.current = watcher
+      locationSubscriptionRef.current = watcher;
     } catch (error) {
-      console.error('Error starting location watcher:', error)
+      console.error("Error starting location watcher:", error);
       // Throwing error here so initScreen can catch and show alert
-      throw error
+      throw error;
     }
-  }, [getLatestLocation])
+  }, [getLatestLocation]);
 
   const ensureCameraPermission = useCallback(async () => {
     if (!cameraPermission?.granted) {
-      const result = await requestCameraPermission()
-      return result.granted
+      const result = await requestCameraPermission();
+      return result.granted;
     }
-    return true
-  }, [cameraPermission?.granted, requestCameraPermission])
+    return true;
+  }, [cameraPermission?.granted, requestCameraPermission]);
 
   const loadInitialData = useCallback(async () => {
-    const res = await getLokasiAbsensi()
+    const res = await getLokasiAbsensi();
 
     if (!res || !res.success) {
-      throw new Error(res?.message || 'Gagal mengambil lokasi absensi.')
+      throw new Error(res?.message || "Gagal mengambil lokasi absensi.");
     }
 
-    const list = Array.isArray(res.data) ? res.data : []
-    setLokasiList(list)
+    const list = Array.isArray(res.data) ? res.data : [];
+    setLokasiList(list);
 
     if (list.length === 0) {
-      setSelectedLokasi(null)
-      return
+      setSelectedLokasi(null);
+      return;
     }
 
     if (list.length === 1) {
-      setSelectedLokasi(list[0])
-      return
+      setSelectedLokasi(list[0]);
+      return;
     }
 
-    const defaultLokasiId = user?.id_lokasi_absen_default
+    const defaultLokasiId = user?.id_lokasi_absen_default;
 
     if (defaultLokasiId) {
       const defaultLokasi = list.find(
-        (item) => String(item.id_lokasi) === String(defaultLokasiId)
-      )
+        (item) => String(item.id_lokasi) === String(defaultLokasiId),
+      );
 
       if (defaultLokasi) {
-        setSelectedLokasi(defaultLokasi)
-        return
+        setSelectedLokasi(defaultLokasi);
+        return;
       }
     }
 
     setSelectedLokasi((prev) => {
-      if (!prev) return list[0] || null
+      if (!prev) return list[0] || null;
 
       const existingSelected = list.find(
-        (item) => String(item.id_lokasi) === String(prev.id_lokasi)
-      )
+        (item) => String(item.id_lokasi) === String(prev.id_lokasi),
+      );
 
-      return existingSelected || list[0] || null
-    })
-  }, [user?.id_lokasi_absen_default])
+      return existingSelected || list[0] || null;
+    });
+  }, [user?.id_lokasi_absen_default]);
 
   const resetScreenState = useCallback(() => {
-    setSelfieUri(null)
-    setSelfieBase64(null)
-    setSelfieChecked(false)
-    setCameraLoading(false)
-    setCameraReady(false)
-    setHasTakenSelfie(false)
-  }, [])
+    setSelfieUri(null);
+    setSelfieBase64(null);
+    setSelfieChecked(false);
+    setCameraLoading(false);
+    setCameraReady(false);
+    setHasTakenSelfie(false);
+  }, []);
 
   const initScreen = useCallback(async () => {
     try {
-      setLoading(true)
-      resetScreenState()
-      await Promise.all([startLocationWatcher(), loadInitialData()])
+      setLoading(true);
+      resetScreenState();
+      await Promise.all([startLocationWatcher(), loadInitialData()]);
     } catch (error: any) {
-      Alert.alert('Error', error?.message || 'Gagal memuat halaman absensi.')
+      Alert.alert("Error", error?.message || "Gagal memuat halaman absensi.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [loadInitialData, resetScreenState, startLocationWatcher])
+  }, [loadInitialData, resetScreenState, startLocationWatcher]);
 
   const onRefresh = useCallback(async () => {
     try {
-      setRefreshing(true)
-      resetScreenState()
-      await Promise.all([getLatestLocation(), loadInitialData()])
+      setRefreshing(true);
+      resetScreenState();
+      await Promise.all([getLatestLocation(), loadInitialData()]);
     } catch (error: any) {
-      Alert.alert('Error', error?.message || 'Gagal refresh data absensi.')
+      Alert.alert("Error", error?.message || "Gagal refresh data absensi.");
     } finally {
-      setRefreshing(false)
+      setRefreshing(false);
     }
-  }, [getLatestLocation, loadInitialData, resetScreenState])
+  }, [getLatestLocation, loadInitialData, resetScreenState]);
 
   const handleCameraReady = useCallback(() => {
     if (isMounted.current) {
-      setCameraReady(true)
+      setCameraReady(true);
     }
-  }, [])
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
-      isMounted.current = true
-      initScreen()
+      isMounted.current = true;
+      initScreen();
 
       return () => {
-        isMounted.current = false
+        isMounted.current = false;
         if (locationSubscriptionRef.current) {
-          locationSubscriptionRef.current.remove()
-          locationSubscriptionRef.current = null
+          locationSubscriptionRef.current.remove();
+          locationSubscriptionRef.current = null;
         }
-      }
-    }, [initScreen])
-  )
+      };
+    }, [initScreen]),
+  );
 
   useEffect(() => {
     const prepareCamera = async () => {
-      if (!selectedLokasi) return
+      if (!selectedLokasi) return;
 
-      setCameraReady(false)
-      const granted = await ensureCameraPermission()
+      setCameraReady(false);
+      const granted = await ensureCameraPermission();
       if (granted) {
-        setCameraReady(true)
+        setCameraReady(true);
       }
-    }
+    };
 
-    prepareCamera()
-  }, [selectedLokasi, ensureCameraPermission])
+    prepareCamera();
+  }, [selectedLokasi, ensureCameraPermission]);
 
   const distanceMeter = useMemo(() => {
-    if (!currentLocation || !selectedLokasi) return null
+    if (!currentLocation || !selectedLokasi) return null;
 
     return haversineDistance(
       currentLocation.latitude,
       currentLocation.longitude,
       selectedLokasi.latitude,
-      selectedLokasi.longitude
-    )
-  }, [currentLocation, selectedLokasi])
+      selectedLokasi.longitude,
+    );
+  }, [currentLocation, selectedLokasi]);
 
   const isWithinRadius = useMemo(() => {
-    if (!selectedLokasi || distanceMeter === null) return false
-    return distanceMeter <= selectedLokasi.radius_meter
-  }, [selectedLokasi, distanceMeter])
+    if (!selectedLokasi || distanceMeter === null) return false;
+    return distanceMeter <= selectedLokasi.radius_meter;
+  }, [selectedLokasi, distanceMeter]);
 
   const dynamicDistanceText = useMemo(() => {
-    if (!selectedLokasi || distanceMeter === null) return '-'
-    return `${distanceMeter.toFixed(2)} meter`
-  }, [selectedLokasi, distanceMeter])
+    if (!selectedLokasi || distanceMeter === null) return "-";
+    return `${distanceMeter.toFixed(2)} meter`;
+  }, [selectedLokasi, distanceMeter]);
 
   const submitAbsensi = useCallback(
     async (
@@ -271,16 +282,16 @@ export default function AbsensiScreen() {
       fotoBase64: string,
       coords: UserCoordinate,
       lokasi: LokasiAbsensi,
-      distance: number
+      distance: number,
     ) => {
       try {
-        setSubmitting(true)
+        setSubmitting(true);
 
         const deviceInfo = [
-          Device.brand || 'Unknown Brand',
-          Device.modelName || 'Unknown Model',
-          `${Device.osName || 'Unknown OS'} ${Device.osVersion || ''}`.trim(),
-        ].join(' | ')
+          Device.brand || "Unknown Brand",
+          Device.modelName || "Unknown Model",
+          `${Device.osName || "Unknown OS"} ${Device.osVersion || ""}`.trim(),
+        ].join(" | ");
 
         const res = await createAbsensi({
           id_lokasi: String(lokasi.id_lokasi),
@@ -288,106 +299,113 @@ export default function AbsensiScreen() {
           longitude: coords.longitude,
           foto_absensi: fotoBase64,
           device_info: deviceInfo,
-        })
+        });
 
         if (!res.success) {
-          throw new Error(res.message || 'Absensi gagal dikirim.')
+          throw new Error(res.message || "Absensi gagal dikirim.");
         }
 
         router.replace({
-          pathname: '/absensi/success',
+          pathname: "/absensi/success",
           params: {
             foto: fotoUri,
             nama_lokasi: lokasi.nama_lokasi,
-            alamat: lokasi.alamat || '',
-            waktu: res.data?.waktu_absensi || res.data?.tanggal || new Date().toISOString(),
-            distance: res.data?.distance_meter?.toString() || distance.toFixed(2),
+            alamat: lokasi.alamat || "",
+            waktu:
+              res.data?.waktu_absensi ||
+              res.data?.tanggal ||
+              new Date().toISOString(),
+            distance:
+              res.data?.distance_meter?.toString() || distance.toFixed(2),
           },
-        })
+        });
       } catch (error: any) {
-        Alert.alert('Gagal', error?.message || 'Absensi gagal dikirim.')
+        Alert.alert("Gagal", error?.message || "Absensi gagal dikirim.");
       } finally {
-        setSubmitting(false)
+        setSubmitting(false);
       }
     },
-    [router]
-  )
+    [router],
+  );
 
   const handleSelectLokasi = useCallback(async (item: LokasiAbsensi | null) => {
-    setSelectedLokasi(item)
-    setSelfieUri(null)
-    setSelfieBase64(null)
-    setSelfieChecked(false)
-    setCameraReady(false)
-    setHasTakenSelfie(false)
-  }, [])
+    setSelectedLokasi(item);
+    setSelfieUri(null);
+    setSelfieBase64(null);
+    setSelfieChecked(false);
+    setCameraReady(false);
+    setHasTakenSelfie(false);
+  }, []);
 
   const handleTakeSelfie = useCallback(async () => {
     try {
-      const granted = await ensureCameraPermission()
+      const granted = await ensureCameraPermission();
       if (!granted) {
-        Alert.alert('Izin Kamera', 'Aplikasi membutuhkan akses kamera untuk selfie absensi.')
-        return
+        Alert.alert(
+          "Izin Kamera",
+          "Aplikasi membutuhkan akses kamera untuk selfie absensi.",
+        );
+        return;
       }
 
       if (!cameraRef.current) {
-        Alert.alert('Error', 'Kamera belum siap.')
-        return
+        Alert.alert("Error", "Kamera belum siap.");
+        return;
       }
 
       if (!selectedLokasi) {
-        Alert.alert('Validasi', 'Lokasi kantor belum dipilih.')
-        return
+        Alert.alert("Validasi", "Lokasi kantor belum dipilih.");
+        return;
       }
 
-      setCameraLoading(true)
+      setCameraLoading(true);
 
       const photo = await cameraRef.current.takePictureAsync({
         quality: 0.6,
         base64: true,
-      })
+      });
 
       if (!photo?.uri || !photo?.base64) {
-        throw new Error('Foto selfie gagal diambil.')
+        throw new Error("Foto selfie gagal diambil.");
       }
 
-      const latestCoords = await getLatestLocation()
+      const latestCoords = await getLatestLocation();
 
       const finalDistance = haversineDistance(
         latestCoords.latitude,
         latestCoords.longitude,
         selectedLokasi.latitude,
-        selectedLokasi.longitude
-      )
+        selectedLokasi.longitude,
+      );
 
-      const withinRadius = finalDistance <= selectedLokasi.radius_meter
-      const finalBase64 = `data:image/jpeg;base64,${photo.base64}`
+      const withinRadius = finalDistance <= selectedLokasi.radius_meter;
+      const finalBase64 = `data:image/jpeg;base64,${photo.base64}`;
 
-      setSelfieUri(photo.uri)
-      setSelfieBase64(finalBase64)
-      setSelfieChecked(true)
-      setHasTakenSelfie(true)
+      setSelfieUri(photo.uri);
+      setSelfieBase64(finalBase64);
+      setSelfieChecked(true);
+      setHasTakenSelfie(true);
 
       if (!withinRadius) {
         Alert.alert(
-          'Informasi',
+          "Informasi",
           `Anda di luar jangkauan. Jarak Anda ${finalDistance.toFixed(2)} meter, maksimal radius ${selectedLokasi.radius_meter} meter.`,
           [
             {
-              text: 'OK',
+              text: "OK",
               onPress: () => {
-                setSelfieUri(null)
-                setSelfieBase64(null)
-                setCameraReady(false)
+                setSelfieUri(null);
+                setSelfieBase64(null);
+                setCameraReady(false);
 
                 requestAnimationFrame(() => {
-                  setCameraReady(true)
-                })
+                  setCameraReady(true);
+                });
               },
             },
-          ]
-        )
-        return
+          ],
+        );
+        return;
       }
 
       await submitAbsensi(
@@ -395,14 +413,19 @@ export default function AbsensiScreen() {
         finalBase64,
         latestCoords,
         selectedLokasi,
-        finalDistance
-      )
+        finalDistance,
+      );
     } catch (error: any) {
-      Alert.alert('Error', error?.message || 'Gagal mengambil foto selfie.')
+      Alert.alert("Error", error?.message || "Gagal mengambil foto selfie.");
     } finally {
-      setCameraLoading(false)
+      setCameraLoading(false);
     }
-  }, [ensureCameraPermission, getLatestLocation, selectedLokasi, submitAbsensi])
+  }, [
+    ensureCameraPermission,
+    getLatestLocation,
+    selectedLokasi,
+    submitAbsensi,
+  ]);
 
   if (loading) {
     return (
@@ -412,15 +435,22 @@ export default function AbsensiScreen() {
           <Text style={styles.loadingText}>Memuat halaman absensi...</Text>
         </View>
       </SafeAreaView>
-    )
+    );
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} translucent />
+    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor={COLORS.primary}
+        translucent
+      />
       <View style={[styles.headerBackground, { paddingTop: 8 }]}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backBtn}
+          >
             <Ionicons name="arrow-back" size={24} color="#FFF" />
           </TouchableOpacity>
           <View>
@@ -433,14 +463,16 @@ export default function AbsensiScreen() {
         <ScrollView
           contentContainerStyle={styles.container}
           showsVerticalScrollIndicator={false}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
         >
-          <View style={styles.profileCard}>
+          {/* <View style={styles.profileCard}>
             <Text style={styles.profileName}>{user?.nama_pegawai || '-'}</Text>
-          </View>
+          </View> */}
 
           <View style={styles.timeCard}>
-            <Text style={styles.timeValue}>{currentTime || '-'}</Text>
+            <Text style={styles.timeValue}>{currentTime || "-"}</Text>
             <Text style={styles.distanceDynamicText}>
               Jarak ke lokasi: {dynamicDistanceText}
             </Text>
@@ -449,7 +481,10 @@ export default function AbsensiScreen() {
           <View style={styles.card}>
             <View style={styles.cameraBox}>
               {selfieUri ? (
-                <Image source={{ uri: selfieUri }} style={styles.previewImage} />
+                <Image
+                  source={{ uri: selfieUri }}
+                  style={styles.previewImage}
+                />
               ) : cameraPermission?.granted && selectedLokasi ? (
                 <CameraView
                   ref={cameraRef}
@@ -462,19 +497,21 @@ export default function AbsensiScreen() {
                   <Ionicons name="camera-outline" size={42} color="#FFF" />
                   <Text style={styles.cameraPlaceholderText}>
                     {selectedLokasi
-                      ? 'Izinkan kamera untuk mulai selfie absensi'
-                      : 'Pilih lokasi kantor terlebih dahulu agar kamera siap'}
+                      ? "Izinkan kamera untuk mulai selfie absensi"
+                      : "Pilih lokasi kantor terlebih dahulu agar kamera siap"}
                   </Text>
 
                   {selectedLokasi && (
                     <TouchableOpacity
                       style={styles.permissionButton}
                       onPress={async () => {
-                        const granted = await ensureCameraPermission()
-                        if (granted) setCameraReady(true)
+                        const granted = await ensureCameraPermission();
+                        if (granted) setCameraReady(true);
                       }}
                     >
-                      <Text style={styles.permissionButtonText}>Izinkan Kamera</Text>
+                      <Text style={styles.permissionButtonText}>
+                        Izinkan Kamera
+                      </Text>
                     </TouchableOpacity>
                   )}
                 </View>
@@ -484,17 +521,22 @@ export default function AbsensiScreen() {
             <TouchableOpacity
               style={[
                 styles.selfieButton,
-                (!selectedLokasi || !cameraReady || cameraLoading || submitting) &&
+                (!selectedLokasi ||
+                  !cameraReady ||
+                  cameraLoading ||
+                  submitting) &&
                   styles.selfieButtonDisabled,
               ]}
               onPress={handleTakeSelfie}
-              disabled={!selectedLokasi || !cameraReady || cameraLoading || submitting}
+              disabled={
+                !selectedLokasi || !cameraReady || cameraLoading || submitting
+              }
             >
               {cameraLoading || submitting ? (
                 <ActivityIndicator color="#fff" />
               ) : (
                 <Text style={styles.selfieButtonText}>
-                  {hasTakenSelfie ? 'Ambil Ulang Selfie' : 'Ambil Selfie'}
+                  {hasTakenSelfie ? "Ambil Ulang Selfie" : "Ambil Selfie"}
                 </Text>
               )}
             </TouchableOpacity>
@@ -520,12 +562,15 @@ export default function AbsensiScreen() {
 
           <View style={styles.card}>
             <Text style={styles.sectionTitle}>Lokasi Selfie</Text>
-            <AbsensiMap currentLocation={currentLocation} selectedLokasi={selectedLokasi} />
+            <AbsensiMap
+              currentLocation={currentLocation}
+              selectedLokasi={selectedLokasi}
+            />
           </View>
         </ScrollView>
       </View>
     </SafeAreaView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -536,18 +581,18 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 44,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 20,
     paddingTop: 10,
   },
   backBtn: { marginRight: 15 },
-  headerTitle: { fontSize: 22, fontWeight: '800', color: '#FFF' },
-  headerSubtitle: { fontSize: 13, color: '#E5E7EB' },
+  headerTitle: { fontSize: 22, fontWeight: "800", color: "#FFF" },
+  headerSubtitle: { fontSize: 13, color: "#E5E7EB" },
 
   contentContainer: {
     flex: 1,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: "#F3F4F6",
     borderTopLeftRadius: 34,
     marginTop: -10,
   },
@@ -558,68 +603,68 @@ const styles = StyleSheet.create({
   loadingContainer: {
     flex: 1,
     backgroundColor: COLORS.white,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
   loadingText: {
     marginTop: 12,
-    color: '#64748b',
+    color: "#64748b",
     fontSize: 14,
   },
 
   profileCard: {
-    backgroundColor: '#FFF',
+    backgroundColor: "#FFF",
     paddingVertical: 18,
     paddingHorizontal: 18,
     borderRadius: 22,
     marginBottom: 16,
     elevation: 3,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.08,
     shadowRadius: 10,
   },
   profileName: {
     fontSize: 18,
-    fontWeight: '800',
+    fontWeight: "800",
     color: COLORS.primary,
-    textAlign: 'center',
+    textAlign: "center",
   },
 
   timeCard: {
-    backgroundColor: '#FFF',
+    backgroundColor: "#FFF",
     borderRadius: 18,
     padding: 16,
     marginBottom: 14,
   },
   timeValue: {
     fontSize: 24,
-    fontWeight: '800',
+    fontWeight: "800",
     color: COLORS.primary,
     letterSpacing: 1,
   },
   coordinateText: {
     fontSize: 14,
-    color: '#111827',
+    color: "#111827",
     marginTop: 4,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   distanceDynamicText: {
     fontSize: 14,
     color: COLORS.primary,
     marginTop: 8,
-    fontWeight: '700',
+    fontWeight: "700",
   },
 
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: "700",
     marginBottom: 12,
-    color: '#0f172a',
+    color: "#0f172a",
   },
 
   card: {
-    backgroundColor: '#FFF',
+    backgroundColor: "#FFF",
     borderRadius: 18,
     padding: 16,
     marginBottom: 14,
@@ -628,25 +673,25 @@ const styles = StyleSheet.create({
   cameraBox: {
     height: 360,
     borderRadius: 20,
-    overflow: 'hidden',
-    backgroundColor: '#111827',
+    overflow: "hidden",
+    backgroundColor: "#111827",
   },
   camera: {
     flex: 1,
   },
   previewImage: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   cameraPlaceholder: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
   cameraPlaceholderText: {
-    color: '#FFF',
-    textAlign: 'center',
+    color: "#FFF",
+    textAlign: "center",
     marginTop: 12,
     marginBottom: 14,
     lineHeight: 20,
@@ -658,8 +703,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   permissionButtonText: {
-    color: '#FFF',
-    fontWeight: '700',
+    color: "#FFF",
+    fontWeight: "700",
   },
 
   selfieButton: {
@@ -667,18 +712,18 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
     borderRadius: 14,
     paddingVertical: 14,
-    alignItems: 'center',
+    alignItems: "center",
   },
   selfieButtonDisabled: {
-    backgroundColor: '#94A3B8',
+    backgroundColor: "#94A3B8",
   },
   selfieButtonText: {
-    color: '#FFF',
-    fontWeight: '700',
+    color: "#FFF",
+    fontWeight: "700",
     fontSize: 15,
   },
 
   jarakCardWrapper: {
     marginTop: 14,
   },
-})
+});

@@ -49,7 +49,7 @@ export default function BarcodeScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} translucent />
 
       <View style={[styles.headerBackground, { paddingTop: 8 }]}>

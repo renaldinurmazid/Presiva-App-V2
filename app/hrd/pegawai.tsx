@@ -353,6 +353,7 @@ export default function PegawaiScreen() {
               <TextInput
                 placeholder="Nama Lengkap"
                 style={styles.input}
+                placeholderTextColor="#9CA3AF"
                 value={form.nama_pegawai}
                 onChangeText={(t) => setForm({ ...form, nama_pegawai: t })}
               />
@@ -360,6 +361,7 @@ export default function PegawaiScreen() {
               <TextInput
                 placeholder="Email (Username)"
                 style={styles.input}
+                placeholderTextColor="#9CA3AF"
                 autoCapitalize="none"
                 keyboardType="email-address"
                 value={form.email}
@@ -611,7 +613,8 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     padding: 12,
     fontSize: 14,
-    marginTop: 10
+    marginTop: 10,
+    color: '#111827'
   },
 
   selectBox: {

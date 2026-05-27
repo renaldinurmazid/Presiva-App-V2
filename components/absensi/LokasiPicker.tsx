@@ -66,6 +66,8 @@ export default function LokasiPicker({
           selectedValue={selectedLokasi?.id_lokasi || ''}
           onValueChange={handleChange}
           enabled={!disabled}
+          style={{ color: '#111827' }}
+          dropdownIconColor="#111827"
         >
           <Picker.Item label="-- Pilih Lokasi Kantor --" value="" />
           {safeLokasiList.map((item) => (

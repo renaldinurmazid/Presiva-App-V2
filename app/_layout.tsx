@@ -6,6 +6,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { useAuthStore } from '@/store/auth.store'
 import { COLORS } from '@/constants/colors'
 import { setAuthToken } from '@/services/api'
+import * as Updates from 'expo-updates'
+import { Alert } from 'react-native'
 
 export default function RootLayout() {
   const router = useRouter()
@@ -19,6 +21,23 @@ export default function RootLayout() {
 
   useEffect(() => {
     const init = async () => {
+      try {
+        // Check for OTA updates
+        if (!__DEV__) {
+          const update = await Updates.checkForUpdateAsync()
+          if (update.isAvailable) {
+            await Updates.fetchUpdateAsync()
+            Alert.alert(
+              'Update Tersedia',
+              'Aplikasi telah diperbarui ke versi terbaru. Restart sekarang?',
+              [{ text: 'Oke', onPress: async () => await Updates.reloadAsync() }]
+            )
+          }
+        }
+      } catch (e) {
+        console.log('Error checking for updates:', e)
+      }
+
       try {
         await restoreSession()
       } catch {
