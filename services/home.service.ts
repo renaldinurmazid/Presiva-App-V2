@@ -13,6 +13,7 @@ export type HomeResponse = {
       role: string;
       jabatan: string | null;
       divisi: string | null;
+      id_lokasi_absen_default?: string | number;
     };
     shift_hari_ini: {
       id_pegawai_shift: number | null;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { COLORS } from '@/constants/colors';
+import { Colors, FontSize, FontFamily, Radius, Spacing } from '@/constants/colors';
 
 type InformasiItem = {
   id_informasi: number;
@@ -15,7 +15,6 @@ type Props = {
 };
 
 export default function InformasiSection({ items }: Props) {
-//console.log('INFORMASI ITEMS:', JSON.stringify(items, null, 2));
   return (
     <View style={styles.wrapper}>
       <Text style={styles.title}>Informasi</Text>
@@ -43,50 +42,53 @@ export default function InformasiSection({ items }: Props) {
 
 const styles = StyleSheet.create({
   wrapper: {
-    paddingHorizontal: 20,
-    marginTop: 24,
+    paddingHorizontal: Spacing[4],
+    marginTop: Spacing[5],
   },
   title: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: COLORS.primary,
-    marginBottom: 12,
+    fontSize: FontSize.lg,
+    fontFamily: FontFamily.semibold,
+    color: Colors.neutral[900],
+    marginBottom: Spacing[3],
   },
   card: {
-    backgroundColor: COLORS.white,
-    borderRadius: 18,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 7,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 2,
+    backgroundColor: Colors.neutral[0],
+    borderRadius: Radius.lg,
+    padding: Spacing[4],
+    marginBottom: Spacing[3],
+    borderWidth: 1,
+    borderColor: Colors.neutral[100],
+    elevation: 0,
+    shadowOpacity: 0,
   },
   cardTitle: {
-    fontSize: 15,
-    fontWeight: '800',
-    color: COLORS.textPrimary,
+    fontSize: FontSize.md,
+    fontFamily: FontFamily.semibold,
+    color: Colors.neutral[900],
   },
   cardDate: {
-    fontSize: 12,
-    color: COLORS.accentOrange,
-    marginTop: 6,
-    fontWeight: '700',
+    fontSize: FontSize.xs,
+    fontFamily: FontFamily.medium,
+    color: Colors.primary[500],
+    marginTop: Spacing[2],
   },
   cardDesc: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
-    marginTop: 8,
-    lineHeight: 18,
+    fontSize: FontSize.base,
+    fontFamily: FontFamily.regular,
+    color: Colors.neutral[700],
+    marginTop: Spacing[2],
+    lineHeight: 20,
   },
   emptyCard: {
-    backgroundColor: COLORS.white,
-    borderRadius: 18,
-    padding: 18,
+    backgroundColor: Colors.neutral[0],
+    borderRadius: Radius.lg,
+    padding: Spacing[4],
+    borderWidth: 1,
+    borderColor: Colors.neutral[100],
   },
   emptyText: {
-    color: COLORS.textSecondary,
-    fontSize: 13,
+    fontFamily: FontFamily.regular,
+    color: Colors.neutral[500],
+    fontSize: FontSize.base,
   },
 });

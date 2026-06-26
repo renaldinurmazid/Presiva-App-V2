@@ -1,11 +1,11 @@
 import React, { useCallback, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, StatusBar, Alert } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
+import { ChevronLeft } from 'lucide-react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import QRCode from 'react-native-qrcode-svg';
 
-import { COLORS } from '@/constants/colors';
+import { Colors, FontSize, FontFamily, Radius, Spacing } from '@/constants/colors';
 import { api } from '@/services/api';
 
 export default function BarcodeScreen() {
@@ -33,15 +33,12 @@ export default function BarcodeScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      // Saat halaman dibuka / difokuskan
       loadData(true);
 
-      // Auto refresh selama halaman masih terbuka
       const interval = setInterval(() => {
         loadData(false);
-      }, 60000); // refresh tiap 60 detik
+      }, 60000);
 
-      // Cleanup saat keluar dari halaman
       return () => {
         clearInterval(interval);
       };
@@ -50,112 +47,116 @@ export default function BarcodeScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} translucent />
+      <StatusBar barStyle="dark-content" backgroundColor={Colors.neutral[0]} translucent />
 
-      <View style={[styles.headerBackground, { paddingTop: 8 }]}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-            <Ionicons name="arrow-back" size={24} color="#FFF" />
-          </TouchableOpacity>
-          <View>
-            <Text style={styles.headerTitle}>QR Code Pegawai</Text>
-          </View>
-        </View>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+          <ChevronLeft size={22} color={Colors.neutral[900]} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>QR Code Pegawai</Text>
       </View>
 
       <View style={styles.contentContainer}>
         <View style={styles.content}>
           <View style={styles.qrCard}>
-            <Text style={styles.instansiName}>{data.nama_pegawai || 'Memuat...'}</Text>
-            <Text style={styles.instansiName}>{data.nama_mitra || 'Memuat...'}</Text>
+            <Text style={styles.employeeName}>{data.nama_pegawai || 'Memuat...'}</Text>
+            <Text style={styles.mitraName}>{data.nama_mitra || 'Memuat...'}</Text>
             <Text style={styles.lokasiName}>{data.alamat_mitra || '-'}</Text>
 
             <View style={styles.qrWrapper}>
               {loading ? (
                 <View style={styles.loaderBox}>
-                  <ActivityIndicator size="large" color={COLORS.primary} />
+                  <ActivityIndicator size="large" color={Colors.primary[500]} />
                 </View>
               ) : data.qr_string ? (
                 <QRCode
                   value={data.qr_string}
                   size={220}
-                  color="black"
-                  backgroundColor="white"
+                  color={Colors.neutral[900]}
+                  backgroundColor={Colors.neutral[0]}
                 />
               ) : null}
             </View>
-
           </View>
         </View>
-
       </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: COLORS.primary },
-  headerBackground: {
-    backgroundColor: COLORS.primary,
-    paddingBottom: 30,
-    borderBottomRightRadius: 44
+  safeArea: { 
+    flex: 1, 
+    backgroundColor: Colors.neutral[0] 
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 10
+    height: 56,
+    paddingHorizontal: Spacing[4],
+    backgroundColor: Colors.neutral[0],
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.neutral[100],
   },
-  backBtn: { marginRight: 15 },
-  headerTitle: { fontSize: 22, fontWeight: '800', color: '#FFF' },
-  headerSubtitle: { fontSize: 13, color: '#E5E7EB' },
+  backBtn: { 
+    marginRight: Spacing[4] 
+  },
+  headerTitle: { 
+    fontSize: FontSize.lg, 
+    fontFamily: FontFamily.semibold, 
+    color: Colors.neutral[900] 
+  },
   contentContainer: {
     flex: 1,
-    backgroundColor: '#F3F4F6',
-    borderTopLeftRadius: 34,
-    marginTop: -10
+    backgroundColor: Colors.neutral[50],
   },
-  content: { flex: 1, padding: 20, justifyContent: 'center' },
+  content: { 
+    flex: 1, 
+    padding: Spacing[4], 
+    justifyContent: 'center' 
+  },
   qrCard: {
-    backgroundColor: '#FFF',
-    paddingVertical: 40,
-    paddingHorizontal: 20,
-    borderRadius: 32,
+    backgroundColor: Colors.neutral[0],
+    paddingVertical: Spacing[8],
+    paddingHorizontal: Spacing[4],
+    borderRadius: Radius.lg,
     alignItems: 'center',
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 15,
-  },
-  instansiName: { fontSize: 18, fontWeight: '800', color: COLORS.primary, textAlign: 'center' },
-  lokasiName: { fontSize: 13, color: '#6B7280', marginTop: 4, marginBottom: 25, textAlign: 'center' },
-  qrWrapper: {
-    padding: 15,
-    backgroundColor: '#FFF',
-    borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#F1F5F9'
+    borderColor: Colors.neutral[100],
+    elevation: 0,
+    shadowOpacity: 0,
   },
-  loaderBox: { width: 220, height: 220, justifyContent: 'center' },
-  qrFooterText: {
-    marginTop: 20,
-    fontSize: 11,
-    color: '#9CA3AF',
-    fontFamily: 'monospace'
+  employeeName: { 
+    fontSize: FontSize.lg, 
+    fontFamily: FontFamily.bold, 
+    color: Colors.neutral[900], 
+    textAlign: 'center' 
   },
-  floatingHome: {
-    position: 'absolute',
-    bottom: 30,
-    left: 20,
-    backgroundColor: COLORS.accentOrange,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
+  mitraName: { 
+    fontSize: FontSize.md, 
+    fontFamily: FontFamily.semibold, 
+    color: Colors.primary[500], 
+    textAlign: 'center',
+    marginTop: Spacing[1]
+  },
+  lokasiName: { 
+    fontSize: FontSize.sm, 
+    fontFamily: FontFamily.regular, 
+    color: Colors.neutral[500], 
+    marginTop: Spacing[2], 
+    marginBottom: Spacing[6], 
+    textAlign: 'center' 
+  },
+  qrWrapper: {
+    padding: Spacing[3],
+    backgroundColor: Colors.neutral[0],
+    borderRadius: Radius.lg,
+    borderWidth: 1,
+    borderColor: Colors.neutral[100]
+  },
+  loaderBox: { 
+    width: 220, 
+    height: 220, 
+    justifyContent: 'center' 
   },
 });

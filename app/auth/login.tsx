@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -9,78 +9,81 @@ import {
   ActivityIndicator,
   StatusBar,
   Alert,
-} from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { useRouter } from 'expo-router'
-import { Ionicons } from '@expo/vector-icons'
-import { COLORS } from '@/constants/colors'
-import { useAuthStore } from '@/store/auth.store'
-import { authService } from '@/services/auth.service'
-import { setAuthToken } from '@/services/api'
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { COLORS } from "@/constants/colors";
+import { useAuthStore } from "@/store/auth.store";
+import { authService } from "@/services/auth.service";
+import { setAuthToken } from "@/services/api";
 
 export default function LoginScreen() {
-  const router = useRouter()
-  const setSession = useAuthStore((state) => state.setSession)
+  const router = useRouter();
+  const setSession = useAuthStore((state) => state.setSession);
 
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
-    const emailValue = email.trim()
-    const passwordValue = password.trim()
+    const emailValue = email.trim();
+    const passwordValue = password.trim();
 
     if (!emailValue || !passwordValue) {
-      Alert.alert('Validasi', 'Email dan password wajib diisi.')
-      return
+      Alert.alert("Validasi", "Email dan password wajib diisi.");
+      return;
     }
 
     try {
-      setLoading(true)
+      setLoading(true);
 
       const response = await authService.login({
         email: emailValue,
         password: passwordValue,
-      })
+      });
 
       if (!response?.success) {
-        Alert.alert('Login Gagal', response?.message || 'Email atau password salah.')
-        return
+        Alert.alert(
+          "Login Gagal",
+          response?.message || "Email atau password salah.",
+        );
+        return;
       }
 
-      const accessToken = response.data?.access_token
+      const accessToken = response.data?.access_token;
       const expiredAt =
         response.data?.expired_at ||
         new Date(
-          Date.now() + (response.data?.expires_in || 2592000) * 1000
-        ).toISOString()
-      const user = response.data?.pegawai
+          Date.now() + (response.data?.expires_in || 2592000) * 1000,
+        ).toISOString();
+      const user = response.data?.pegawai;
 
       if (!accessToken || !user) {
-        throw new Error('Response login tidak lengkap.')
+        throw new Error("Response login tidak lengkap.");
       }
 
-      setAuthToken(accessToken)
+      setAuthToken(accessToken);
 
       await setSession({
         access_token: accessToken,
         expired_at: expiredAt,
         user,
-      })
+      });
 
-      setShowPassword(false)
-      router.replace('/(tabs)/absensi')
+      setShowPassword(false);
+      router.replace("/(tabs)/absensi");
     } catch (error: any) {
       const message =
         error?.response?.data?.message ||
         error?.message ||
-        'Terjadi kesalahan saat login.'
-      Alert.alert('Login Gagal', message)
+        "Terjadi kesalahan saat login.";
+      Alert.alert("Login Gagal", message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -89,7 +92,7 @@ export default function LoginScreen() {
       <View style={styles.container}>
         <View style={styles.logoContainer}>
           <Image
-            source={require('../../assets/images/logo-presiva.png')}
+            source={require("../../assets/logo/presiva-logo.png")}
             style={styles.logo}
             resizeMode="contain"
           />
@@ -132,7 +135,7 @@ export default function LoginScreen() {
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
               <Ionicons
-                name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                name={showPassword ? "eye-off-outline" : "eye-outline"}
                 size={20}
                 color="#666"
               />
@@ -153,11 +156,12 @@ export default function LoginScreen() {
 
           <TouchableOpacity
             style={styles.registerWrapper}
-            onPress={() => router.push('/auth/register-mitra')}
+            onPress={() => router.push("/auth/register-mitra")}
             disabled={loading}
           >
             <Text style={styles.registerText}>
-              Belum punya akun? <Text style={styles.registerLink}>Daftar Mitra</Text>
+              Belum punya akun?{" "}
+              <Text style={styles.registerLink}>Daftar Mitra</Text>
             </Text>
           </TouchableOpacity>
         </View>
@@ -165,7 +169,7 @@ export default function LoginScreen() {
         <Text style={styles.footer}>© PRESIVA</Text>
       </View>
     </SafeAreaView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -177,11 +181,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 24,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
 
   logoContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 40,
   },
 
@@ -193,21 +197,21 @@ const styles = StyleSheet.create({
 
   title: {
     fontSize: 28,
-    fontWeight: '800',
-    color: '#FFF',
+    fontWeight: "800",
+    color: "#FFF",
   },
 
   subtitle: {
     fontSize: 14,
-    color: '#E5E7EB',
+    color: "#E5E7EB",
     marginTop: 4,
   },
 
   card: {
-    backgroundColor: '#FFF',
+    backgroundColor: "#FFF",
     borderRadius: 22,
     padding: 24,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 6 },
@@ -216,14 +220,14 @@ const styles = StyleSheet.create({
 
   loginTitle: {
     fontSize: 22,
-    fontWeight: '800',
+    fontWeight: "800",
     color: COLORS.primary,
     marginBottom: 20,
   },
 
   input: {
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: "#E5E7EB",
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 12,
@@ -233,13 +237,13 @@ const styles = StyleSheet.create({
   },
 
   passwordWrapper: {
-    position: 'relative',
+    position: "relative",
     marginBottom: 14,
   },
 
   passwordInput: {
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: "#E5E7EB",
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 12,
@@ -249,7 +253,7 @@ const styles = StyleSheet.create({
   },
 
   eyeIcon: {
-    position: 'absolute',
+    position: "absolute",
     right: 14,
     top: 13,
   },
@@ -258,7 +262,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.accentOrange,
     paddingVertical: 14,
     borderRadius: 14,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 6,
   },
 
@@ -267,30 +271,30 @@ const styles = StyleSheet.create({
   },
 
   loginButtonText: {
-    color: '#FFF',
-    fontWeight: '800',
+    color: "#FFF",
+    fontWeight: "800",
     fontSize: 14,
   },
 
   registerWrapper: {
     marginTop: 16,
-    alignItems: 'center',
+    alignItems: "center",
   },
 
   registerText: {
     fontSize: 13,
-    color: '#666',
+    color: "#666",
   },
 
   registerLink: {
     color: COLORS.primary,
-    fontWeight: '700',
+    fontWeight: "700",
   },
 
   footer: {
-    textAlign: 'center',
-    color: '#E5E7EB',
+    textAlign: "center",
+    color: "#E5E7EB",
     marginTop: 30,
     fontSize: 12,
   },
-})
+});

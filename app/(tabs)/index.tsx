@@ -6,16 +6,13 @@ import {
   StatusBar,
   ActivityIndicator,
   RefreshControl,
-  Platform,
 } from 'react-native'
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
-import { COLORS } from '@/constants/colors'
-import DashboardHeader from '@/components/home/DashboardHeader'
+import { Colors, FontSize, FontFamily, Radius, Spacing } from '@/constants/colors'
 import ProfileSummaryCard from '@/components/home/ProfileSummaryCard'
 import HomeMenuGrid, { HomeMenuItem } from '@/components/home/HomeMenuGrid'
 import InformasiSection from '@/components/home/InformasiSection'
-import HistoriSection from '@/components/home/HistoriSection'
 import { homeService, HomeResponse } from '@/services/home.service'
 import { useAuthStore } from '@/store/auth.store'
 import { setAuthToken } from '@/services/api'
@@ -28,32 +25,35 @@ export default function HomeScreen() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
   const accessToken = useAuthStore((state) => state.access_token)
   const clearSession = useAuthStore((state) => state.clearSession)
+  const updateUser = useAuthStore((state) => state.updateUser)
 
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [data, setData] = useState<HomeResponse['data'] | null>(null)
 
   const loadHome = useCallback(async () => {
-  //console.log('LOAD HOME DIPANGGIL');
-
-  if (!isAuthenticated || !accessToken) {
-    //console.log('TIDAK AUTH / TOKEN KOSONG');
-    setLoading(false)
-    return
-  }
-  
+    if (!isAuthenticated || !accessToken) {
+      setLoading(false)
+      return
+    }
+    
     try {
       setAuthToken(accessToken)
-
       const result = await homeService.getHome()
-	  //console.log('HOME INFORMASI:', JSON.stringify(result?.data?.informasi, null, 2))  
-	  //console.log('HOME RESULT:', JSON.stringify(result, null, 2))
-	  
       setData(result?.data || null)
-    } catch (error: any) {
-	  //console.log('HOME ERROR:', error?.response?.status, JSON.stringify(error?.response?.data, null, 2), error?.message)
-	
 
+      const serverPegawai = result?.data?.pegawai
+      if (serverPegawai) {
+        await updateUser({
+          nama_pegawai: serverPegawai.nama_pegawai,
+          nama_mitra: serverPegawai.nama_mitra,
+          no_telp: serverPegawai.no_telp,
+          foto: serverPegawai.foto,
+          role: serverPegawai.role,
+          id_lokasi_absen_default: serverPegawai.id_lokasi_absen_default,
+        })
+      }
+    } catch (error: any) {
       if (error?.response?.status === 401) {
         await clearSession()
         setAuthToken(undefined)
@@ -64,7 +64,7 @@ export default function HomeScreen() {
       setLoading(false)
       setRefreshing(false)
     }
-  }, [isAuthenticated, accessToken, clearSession, router])
+  }, [isAuthenticated, accessToken, clearSession, router, updateUser])
 
   useEffect(() => {
     if (!isAuthenticated || !accessToken) {
@@ -85,7 +85,7 @@ export default function HomeScreen() {
     await loadHome()
   }
 
-const menus = useMemo<HomeMenuItem[]>(() => {
+  const menus = useMemo<HomeMenuItem[]>(() => {
     const baseMenus: HomeMenuItem[] = [
       {
         key: 'keluarga',
@@ -132,18 +132,20 @@ const menus = useMemo<HomeMenuItem[]>(() => {
     ]
 
     if (user?.role === 'HRD' || user?.role === 'ADMIN_PRESIVA') {
-      baseMenus.push({
-        key: 'hrd',
-        label: 'HRD',
-        icon: 'business-outline',
-        onPress: () => router.push('/hrd'),
-      }, 
-	  {
-        key: 'laporan_hrd',
-        label: 'LAPORAN HRD',
-        icon: 'bar-chart-outline',
-        onPress: () => router.push('/laporan_hrd'),
-      })
+      baseMenus.push(
+        {
+          key: 'hrd',
+          label: 'HRD',
+          icon: 'business-outline',
+          onPress: () => router.push('/hrd'),
+        }, 
+        {
+          key: 'laporan_hrd',
+          label: 'Laporan HRD',
+          icon: 'bar-chart-outline',
+          onPress: () => router.push('/laporan_hrd'),
+        }
+      )
     }
 
     return baseMenus
@@ -151,7 +153,7 @@ const menus = useMemo<HomeMenuItem[]>(() => {
 
   return (
     <View style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} translucent />
+      <StatusBar barStyle="light-content" backgroundColor={Colors.primary[500]} translucent />
 
       <View style={[styles.headerBackground, { paddingTop: insets.top }]}>
         <ProfileSummaryCard
@@ -165,7 +167,7 @@ const menus = useMemo<HomeMenuItem[]>(() => {
       <View style={styles.contentContainer}>
         {loading ? (
           <View style={styles.loaderWrapper}>
-            <ActivityIndicator size="large" color={COLORS.primary} />
+            <ActivityIndicator size="large" color={Colors.primary[500]} />
           </View>
         ) : (
           <ScrollView
@@ -175,9 +177,7 @@ const menus = useMemo<HomeMenuItem[]>(() => {
             }
           >
             <HomeMenuGrid menus={menus} />
-
             <InformasiSection items={data?.informasi || []} />
-
           </ScrollView>
         )}
       </View>
@@ -188,19 +188,19 @@ const menus = useMemo<HomeMenuItem[]>(() => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: COLORS.primary,
+    backgroundColor: Colors.primary[500],
   },
   headerBackground: {
-    backgroundColor: COLORS.primary,
-    paddingBottom: 28,
-    borderBottomRightRadius: 44,
+    backgroundColor: Colors.primary[500],
+    paddingBottom: Spacing[6],
+    borderBottomRightRadius: Radius.xl,
   },
   contentContainer: {
     flex: 1,
-    backgroundColor: COLORS.background,
-    borderTopLeftRadius: 34,
-    marginTop: -6,
-    paddingTop: 8,
+    backgroundColor: Colors.neutral[50],
+    borderTopLeftRadius: Radius.xl,
+    marginTop: -Spacing[2],
+    paddingTop: Spacing[2],
   },
   loaderWrapper: {
     flex: 1,

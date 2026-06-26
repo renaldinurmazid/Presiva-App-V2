@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { COLORS } from '@/constants/colors';
+import { Colors, FontSize, FontFamily, Radius, Spacing } from '@/constants/colors';
 
 type HistoriItem = {
   id_absensi: number;
@@ -38,8 +38,8 @@ export default function HistoriSection({ items }: Props) {
               </Text>
             </View>
 
-            <Text style={styles.time}>{item.waktu_absensi}</Text>
-            <Text style={styles.location}>{item.nama_lokasi || '-'}</Text>
+            <Text style={styles.time}>Waktu: {item.waktu_absensi}</Text>
+            <Text style={styles.location}>Lokasi: {item.nama_lokasi || '-'}</Text>
           </View>
         ))
       )}
@@ -49,26 +49,25 @@ export default function HistoriSection({ items }: Props) {
 
 const styles = StyleSheet.create({
   wrapper: {
-    paddingHorizontal: 20,
-    marginTop: 24,
-    marginBottom: 32,
+    paddingHorizontal: Spacing[4],
+    marginTop: Spacing[5],
+    marginBottom: Spacing[8],
   },
   title: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: COLORS.primary,
-    marginBottom: 12,
+    fontSize: FontSize.lg,
+    fontFamily: FontFamily.semibold,
+    color: Colors.neutral[900],
+    marginBottom: Spacing[3],
   },
   card: {
-    backgroundColor: COLORS.white,
-    borderRadius: 18,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 7,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 2,
+    backgroundColor: Colors.neutral[0],
+    borderRadius: Radius.lg,
+    padding: Spacing[4],
+    marginBottom: Spacing[3],
+    borderWidth: 1,
+    borderColor: Colors.neutral[100],
+    elevation: 0,
+    shadowOpacity: 0,
   },
   rowBetween: {
     flexDirection: 'row',
@@ -76,43 +75,48 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   date: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: COLORS.textPrimary,
+    fontSize: FontSize.base,
+    fontFamily: FontFamily.semibold,
+    color: Colors.neutral[900],
   },
   time: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
-    marginTop: 8,
+    fontSize: FontSize.sm,
+    fontFamily: FontFamily.regular,
+    color: Colors.neutral[700],
+    marginTop: Spacing[2],
   },
   location: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
-    marginTop: 4,
+    fontSize: FontSize.sm,
+    fontFamily: FontFamily.regular,
+    color: Colors.neutral[700],
+    marginTop: Spacing[1],
   },
   badge: {
-    fontSize: 11,
-    fontWeight: '800',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 999,
+    fontSize: FontSize.xs,
+    fontFamily: FontFamily.semibold,
+    paddingVertical: Spacing[1],
+    paddingHorizontal: Spacing[2] + 2,
+    borderRadius: Radius.full,
     overflow: 'hidden',
   },
   badgeMasuk: {
-    backgroundColor: '#E8F5E9',
-    color: COLORS.success,
+    backgroundColor: Colors.success[100],
+    color: '#16A34A',
   },
   badgeKeluar: {
-    backgroundColor: '#FFF3E0',
-    color: COLORS.accentOrange,
+    backgroundColor: Colors.primary[100],
+    color: Colors.primary[500],
   },
   emptyCard: {
-    backgroundColor: COLORS.white,
-    borderRadius: 18,
-    padding: 18,
+    backgroundColor: Colors.neutral[0],
+    borderRadius: Radius.lg,
+    padding: Spacing[4],
+    borderWidth: 1,
+    borderColor: Colors.neutral[100],
   },
   emptyText: {
-    color: COLORS.textSecondary,
-    fontSize: 13,
+    fontFamily: FontFamily.regular,
+    color: Colors.neutral[500],
+    fontSize: FontSize.base,
   },
 });

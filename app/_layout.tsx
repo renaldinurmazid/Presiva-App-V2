@@ -8,6 +8,13 @@ import { COLORS } from '@/constants/colors'
 import { setAuthToken } from '@/services/api'
 import * as Updates from 'expo-updates'
 import { Alert } from 'react-native'
+import { useFonts } from 'expo-font'
+import {
+  Poppins_400Regular,
+  Poppins_500Medium,
+  Poppins_600SemiBold,
+  Poppins_700Bold,
+} from '@expo-google-fonts/poppins'
 
 export default function RootLayout() {
   const router = useRouter()
@@ -18,6 +25,12 @@ export default function RootLayout() {
   const accessToken = useAuthStore((state) => state.access_token)
 
   const [isReady, setIsReady] = useState(false)
+  const [fontsLoaded] = useFonts({
+    Poppins_400Regular,
+    Poppins_500Medium,
+    Poppins_600SemiBold,
+    Poppins_700Bold,
+  })
 
   useEffect(() => {
     const init = async () => {
@@ -75,7 +88,7 @@ export default function RootLayout() {
     }
   }, [isReady, isAuthenticated, pathname, router])
 
-  if (!isReady) {
+  if (!isReady || !fontsLoaded) {
     return (
       <SafeAreaProvider>
         <GestureHandlerRootView style={styles.root}>

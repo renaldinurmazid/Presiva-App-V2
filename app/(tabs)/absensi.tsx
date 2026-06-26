@@ -16,12 +16,18 @@ import {
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
 import { useFocusEffect, useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { ChevronLeft, Camera } from "lucide-react-native";
 import * as Location from "expo-location";
 import * as Device from "expo-device";
 import { CameraView, useCameraPermissions } from "expo-camera";
 
-import { COLORS } from "@/constants/colors";
+import {
+  Colors,
+  FontSize,
+  FontFamily,
+  Radius,
+  Spacing,
+} from "@/constants/colors";
 import AbsensiMap from "@/components/absensi/AbsensiMap";
 import LokasiPicker from "@/components/absensi/LokasiPicker";
 import JarakInfoCard from "@/components/absensi/JarakInfoCard";
@@ -130,7 +136,6 @@ export default function AbsensiScreen() {
       locationSubscriptionRef.current = watcher;
     } catch (error) {
       console.error("Error starting location watcher:", error);
-      // Throwing error here so initScreen can catch and show alert
       throw error;
     }
   }, [getLatestLocation]);
@@ -273,7 +278,7 @@ export default function AbsensiScreen() {
 
   const dynamicDistanceText = useMemo(() => {
     if (!selectedLokasi || distanceMeter === null) return "-";
-    return `${distanceMeter.toFixed(2)} meter`;
+    return `${distanceMeter.toFixed(1)} m`;
   }, [selectedLokasi, distanceMeter]);
 
   const submitAbsensi = useCallback(
@@ -316,7 +321,7 @@ export default function AbsensiScreen() {
               res.data?.tanggal ||
               new Date().toISOString(),
             distance:
-              res.data?.distance_meter?.toString() || distance.toFixed(2),
+              res.data?.distance_meter?.toString() || distance.toFixed(1),
           },
         });
       } catch (error: any) {
@@ -389,7 +394,7 @@ export default function AbsensiScreen() {
       if (!withinRadius) {
         Alert.alert(
           "Informasi",
-          `Anda di luar jangkauan. Jarak Anda ${finalDistance.toFixed(2)} meter, maksimal radius ${selectedLokasi.radius_meter} meter.`,
+          `Anda di luar jangkauan. Jarak Anda ${finalDistance.toFixed(1)} m, maksimal radius ${selectedLokasi.radius_meter} m.`,
           [
             {
               text: "OK",
@@ -431,7 +436,7 @@ export default function AbsensiScreen() {
     return (
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={COLORS.primary} />
+          <ActivityIndicator size="large" color={Colors.primary[500]} />
           <Text style={styles.loadingText}>Memuat halaman absensi...</Text>
         </View>
       </SafeAreaView>
@@ -441,22 +446,15 @@ export default function AbsensiScreen() {
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
       <StatusBar
-        barStyle="light-content"
-        backgroundColor={COLORS.primary}
+        barStyle="dark-content"
+        backgroundColor={Colors.neutral[0]}
         translucent
       />
-      <View style={[styles.headerBackground, { paddingTop: 8 }]}>
-        <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={styles.backBtn}
-          >
-            <Ionicons name="arrow-back" size={24} color="#FFF" />
-          </TouchableOpacity>
-          <View>
-            <Text style={styles.headerTitle}>Absensi Pegawai</Text>
-          </View>
-        </View>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+          <ChevronLeft size={22} color={Colors.neutral[900]} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Absensi Pegawai</Text>
       </View>
 
       <View style={styles.contentContainer}>
@@ -467,10 +465,6 @@ export default function AbsensiScreen() {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
         >
-          {/* <View style={styles.profileCard}>
-            <Text style={styles.profileName}>{user?.nama_pegawai || '-'}</Text>
-          </View> */}
-
           <View style={styles.timeCard}>
             <Text style={styles.timeValue}>{currentTime || "-"}</Text>
             <Text style={styles.distanceDynamicText}>
@@ -494,7 +488,7 @@ export default function AbsensiScreen() {
                 />
               ) : (
                 <View style={styles.cameraPlaceholder}>
-                  <Ionicons name="camera-outline" size={42} color="#FFF" />
+                  <Camera size={40} color={Colors.neutral[300]} />
                   <Text style={styles.cameraPlaceholderText}>
                     {selectedLokasi
                       ? "Izinkan kamera untuk mulai selfie absensi"
@@ -533,7 +527,7 @@ export default function AbsensiScreen() {
               }
             >
               {cameraLoading || submitting ? (
-                <ActivityIndicator color="#fff" />
+                <ActivityIndicator color={Colors.neutral[0]} />
               ) : (
                 <Text style={styles.selfieButtonText}>
                   {hasTakenSelfie ? "Ambil Ulang Selfie" : "Ambil Selfie"}
@@ -574,107 +568,91 @@ export default function AbsensiScreen() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: COLORS.primary },
-  headerBackground: {
-    backgroundColor: COLORS.primary,
-    paddingBottom: 30,
-    borderBottomRightRadius: 44,
+  safeArea: {
+    flex: 1,
+    backgroundColor: Colors.neutral[0],
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 10,
+    height: 56,
+    paddingHorizontal: Spacing[4],
+    backgroundColor: Colors.neutral[0],
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.neutral[100],
   },
-  backBtn: { marginRight: 15 },
-  headerTitle: { fontSize: 22, fontWeight: "800", color: "#FFF" },
-  headerSubtitle: { fontSize: 13, color: "#E5E7EB" },
-
+  backBtn: {
+    marginRight: Spacing[4],
+  },
+  headerTitle: {
+    fontSize: FontSize.lg,
+    fontFamily: FontFamily.semibold,
+    color: Colors.neutral[900],
+  },
   contentContainer: {
     flex: 1,
-    backgroundColor: "#F3F4F6",
-    borderTopLeftRadius: 34,
-    marginTop: -10,
+    backgroundColor: Colors.neutral[50],
   },
   container: {
-    padding: 20,
-    paddingBottom: 40,
+    padding: Spacing[4],
+    paddingBottom: Spacing[10],
   },
   loadingContainer: {
     flex: 1,
-    backgroundColor: COLORS.white,
+    backgroundColor: Colors.neutral[0],
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
+    padding: Spacing[5],
   },
   loadingText: {
-    marginTop: 12,
-    color: "#64748b",
-    fontSize: 14,
+    marginTop: Spacing[3],
+    color: Colors.neutral[500],
+    fontSize: FontSize.base,
+    fontFamily: FontFamily.regular,
   },
-
-  profileCard: {
-    backgroundColor: "#FFF",
-    paddingVertical: 18,
-    paddingHorizontal: 18,
-    borderRadius: 22,
-    marginBottom: 16,
-    elevation: 3,
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-  },
-  profileName: {
-    fontSize: 18,
-    fontWeight: "800",
-    color: COLORS.primary,
-    textAlign: "center",
-  },
-
   timeCard: {
-    backgroundColor: "#FFF",
-    borderRadius: 18,
-    padding: 16,
-    marginBottom: 14,
+    backgroundColor: Colors.neutral[0],
+    borderRadius: Radius.lg,
+    padding: Spacing[4],
+    marginBottom: Spacing[4],
+    borderWidth: 1,
+    borderColor: Colors.neutral[100],
+    elevation: 0,
+    shadowOpacity: 0,
   },
   timeValue: {
-    fontSize: 24,
-    fontWeight: "800",
-    color: COLORS.primary,
+    fontSize: FontSize.xl,
+    fontFamily: FontFamily.bold,
+    color: Colors.primary[500],
     letterSpacing: 1,
   },
-  coordinateText: {
-    fontSize: 14,
-    color: "#111827",
-    marginTop: 4,
-    fontWeight: "600",
-  },
   distanceDynamicText: {
-    fontSize: 14,
-    color: COLORS.primary,
-    marginTop: 8,
-    fontWeight: "700",
+    fontSize: FontSize.sm,
+    fontFamily: FontFamily.semibold,
+    color: Colors.primary[500],
+    marginTop: Spacing[2],
   },
-
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    marginBottom: 12,
-    color: "#0f172a",
+    fontSize: FontSize.md,
+    fontFamily: FontFamily.semibold,
+    marginBottom: Spacing[3],
+    color: Colors.neutral[900],
   },
-
   card: {
-    backgroundColor: "#FFF",
-    borderRadius: 18,
-    padding: 16,
-    marginBottom: 14,
+    backgroundColor: Colors.neutral[0],
+    borderRadius: Radius.lg,
+    padding: Spacing[4],
+    marginBottom: Spacing[4],
+    borderWidth: 1,
+    borderColor: Colors.neutral[100],
+    elevation: 0,
+    shadowOpacity: 0,
   },
-
   cameraBox: {
     height: 360,
-    borderRadius: 20,
+    borderRadius: Radius.xl,
     overflow: "hidden",
-    backgroundColor: "#111827",
+    backgroundColor: Colors.neutral[900],
   },
   camera: {
     flex: 1,
@@ -687,43 +665,44 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
+    padding: Spacing[5],
   },
   cameraPlaceholderText: {
-    color: "#FFF",
+    color: Colors.neutral[300],
     textAlign: "center",
-    marginTop: 12,
-    marginBottom: 14,
+    marginTop: Spacing[3],
+    marginBottom: Spacing[4],
     lineHeight: 20,
+    fontSize: FontSize.sm,
+    fontFamily: FontFamily.regular,
   },
   permissionButton: {
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: 18,
-    paddingVertical: 12,
-    borderRadius: 12,
+    backgroundColor: Colors.primary[500],
+    paddingHorizontal: Spacing[4],
+    paddingVertical: Spacing[3],
+    borderRadius: Radius.md,
   },
   permissionButtonText: {
-    color: "#FFF",
-    fontWeight: "700",
+    color: Colors.neutral[0],
+    fontFamily: FontFamily.semibold,
+    fontSize: FontSize.base,
   },
-
   selfieButton: {
-    marginTop: 14,
-    backgroundColor: COLORS.primary,
-    borderRadius: 14,
-    paddingVertical: 14,
+    marginTop: Spacing[4],
+    backgroundColor: Colors.primary[500],
+    borderRadius: Radius.md,
+    paddingVertical: Spacing[3] + 2,
     alignItems: "center",
   },
   selfieButtonDisabled: {
-    backgroundColor: "#94A3B8",
+    backgroundColor: Colors.neutral[300],
   },
   selfieButtonText: {
-    color: "#FFF",
-    fontWeight: "700",
-    fontSize: 15,
+    color: Colors.neutral[0],
+    fontFamily: FontFamily.semibold,
+    fontSize: FontSize.md,
   },
-
   jarakCardWrapper: {
-    marginTop: 14,
+    marginTop: Spacing[4],
   },
 });

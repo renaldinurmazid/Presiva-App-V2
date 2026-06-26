@@ -1,15 +1,15 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { ChevronRight, User } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
-import { COLORS } from '@/constants/colors';
+import { Colors, FontSize, FontFamily, Radius, Spacing } from '@/constants/colors';
 
 type Props = {
   namaPegawai: string;
   namaMitra?: string | null;
   noTelp?: string | null;
   foto?: string | null;
-  idPegawai?: string; // optional kalau nanti mau kirim param
+  idPegawai?: string;
 };
 
 const BASE_URL = 'https://gosukses.com';
@@ -54,7 +54,7 @@ export default function ProfileSummaryCard({
       onPress={() =>
         router.push({
           pathname: '/pegawai/biodata',
-          params: { id: idPegawai || '' }, // optional kirim id
+          params: { id: idPegawai || '' },
         })
       }
       style={({ pressed }) => [
@@ -73,10 +73,9 @@ export default function ProfileSummaryCard({
           />
         ) : (
           <View style={styles.avatarPlaceholder}>
-            <Ionicons
-              name="person-outline"
-              size={30}
-              color={COLORS.primary}
+            <User
+              size={24}
+              color={Colors.primary[500]}
             />
           </View>
         )}
@@ -88,16 +87,15 @@ export default function ProfileSummaryCard({
           <Text style={styles.meta} numberOfLines={1}>
             {namaMitra || '-'}
           </Text>
-          <Text style={styles.meta}>
+          <Text style={styles.meta} numberOfLines={1}>
             Telp: {noTelp || '-'}
           </Text>
         </View>
       </View>
 
-      <Ionicons
-        name="chevron-forward-outline"
-        size={20}
-        color="#D1D5DB"
+      <ChevronRight
+        size={18}
+        color={Colors.neutral[500]}
       />
     </Pressable>
   );
@@ -105,19 +103,18 @@ export default function ProfileSummaryCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#FFF',
-    marginHorizontal: 20,
-    marginTop: 18,
-    borderRadius: 22,
-    padding: 18,
+    backgroundColor: Colors.neutral[0],
+    marginHorizontal: Spacing[4],
+    marginTop: Spacing[4],
+    borderRadius: Radius.lg,
+    padding: Spacing[4],
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
+    borderWidth: 1,
+    borderColor: Colors.neutral[100],
+    elevation: 0,
+    shadowOpacity: 0,
   },
   left: {
     flexDirection: 'row',
@@ -125,30 +122,38 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   avatar: {
-    width: 68,
-    height: 68,
-    borderRadius: 34,
-    marginRight: 14,
-    backgroundColor: '#F3F4F6',
+    width: 56,
+    height: 56,
+    borderRadius: Radius.full,
+    marginRight: Spacing[3],
+    backgroundColor: Colors.neutral[50],
+    borderWidth: 2,
+    borderColor: Colors.neutral[100],
   },
   avatarPlaceholder: {
-    width: 68,
-    height: 68,
-    borderRadius: 34,
-    marginRight: 14,
-    backgroundColor: '#EAF3FD',
+    width: 56,
+    height: 56,
+    borderRadius: Radius.full,
+    marginRight: Spacing[3],
+    backgroundColor: Colors.primary[100],
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: Colors.neutral[100],
   },
-  textWrapper: { flex: 1 },
+  textWrapper: { 
+    flex: 1,
+    paddingRight: Spacing[2],
+  },
   name: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#111827',
+    fontSize: FontSize.md,
+    fontFamily: FontFamily.semibold,
+    color: Colors.neutral[900],
   },
   meta: {
-    fontSize: 13,
-    color: '#6B7280',
-    marginTop: 2,
+    fontSize: FontSize.sm,
+    fontFamily: FontFamily.regular,
+    color: Colors.neutral[700],
+    marginTop: Spacing[1],
   },
 });

@@ -27,6 +27,7 @@ type AuthState = {
 
   restoreSession: () => Promise<void>
   clearSession: () => Promise<void>
+  updateUser: (userData: Partial<AuthUser>) => Promise<void>
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -108,5 +109,16 @@ export const useAuthStore = create<AuthState>((set) => ({
       user: null,
       isAuthenticated: false,
     })
+  },
+
+  updateUser: async (userData) => {
+    set((state) => {
+      if (!state.user) return state;
+      const updatedUser = { ...state.user, ...userData };
+      SecureStore.setItemAsync('user', JSON.stringify(updatedUser)).catch((err) => {
+        console.error('Failed to save updated user to SecureStore:', err);
+      });
+      return { user: updatedUser };
+    });
   },
 }))
